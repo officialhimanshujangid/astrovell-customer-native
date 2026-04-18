@@ -11,7 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import AppNavigator from './src/navigation/AppNavigator';
-
+import GlobalChatListener from './src/components/GlobalChatListener';
 // Ensure notifications show up when app is in foreground
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -87,7 +87,11 @@ export default function App() {
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Notification tapped!', response);
+      console.log('Notification tapped!', response.notification.request.content.data);
+      const data = response.notification.request.content.data;
+      if (data?.chatId && global.openChat) {
+        global.openChat(data.chatId);
+      }
     });
 
     return () => {
@@ -107,6 +111,7 @@ export default function App() {
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
+          <GlobalChatListener />
           <Toast />
         </SafeAreaProvider>
       </PersistGate>

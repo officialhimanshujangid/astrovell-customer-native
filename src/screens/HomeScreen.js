@@ -521,7 +521,7 @@ const HomeScreen = ({
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Book a Puja</Text>
               <TouchableOpacity onPress={onPujaPress} activeOpacity={0.8}>
-                <TouchableOpacity><Text style={styles.viewAll}>View All</Text></TouchableOpacity>
+                <Text style={styles.viewAll}>View All</Text>
               </TouchableOpacity>
             </View>
             <ScrollView

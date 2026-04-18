@@ -94,8 +94,16 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
 
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
+    // Notify global listener that we are actively on the chat screen!
+    global.isChatRoomActive = true;
+    global.activeChatRoomId = chatId;
+    
     initChat();
-    return () => cleanup();
+    return () => {
+      global.isChatRoomActive = false;
+      global.activeChatRoomId = null;
+      cleanup();
+    };
   }, [chatId]);
 
   const cleanup = () => {

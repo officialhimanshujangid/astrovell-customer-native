@@ -156,6 +156,7 @@ const CallScreen = ({
   onSearchConsumed,   // notify parent once initialSearch consumed
   onAstrologerPress,  // navigate to astrologer detail
   onWalletPress,      // click the wallet pill to recharge
+  onProfilePress,     // click the profile icon
 }) => {
   const dispatch = useDispatch();
   const { user, walletBalance, settings } = useSelector((state) => state.auth);
@@ -306,9 +307,9 @@ const CallScreen = ({
       {/* White Header (AstroTalk style) */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.headerAvatar}>
+          <TouchableOpacity style={styles.headerAvatar} onPress={() => onMenuPress && onMenuPress()} activeOpacity={0.7}>
             <Ionicons name="person-outline" size={18} color="#555" />
-          </View>
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Hi {user?.name?.split(' ')[0] || 'User'}</Text>
         </View>
         <View style={styles.headerRight}>
@@ -347,10 +348,10 @@ const CallScreen = ({
             <Ionicons name="call-outline" size={20} color="#555" />
           </TouchableOpacity>
 
-          {/* Profile / Sidebar icon */}
+          {/* Profile icon */}
           <TouchableOpacity
             style={[styles.iconBtn, { backgroundColor: colors.goldBg, borderWidth: 1.5, borderColor: colors.gold }]}
-            onPress={() => onMenuPress && onMenuPress()}
+            onPress={() => onProfilePress && onProfilePress()}
             activeOpacity={0.8}
           >
             <Ionicons name="person" size={18} color={colors.gold} />

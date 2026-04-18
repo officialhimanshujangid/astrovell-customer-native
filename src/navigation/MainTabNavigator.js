@@ -71,6 +71,12 @@ const MainTabNavigator = () => {
 
   const { can } = usePermissions();
 
+  // ── Global route handler for Push Notifications ────────────────────────────
+  React.useEffect(() => {
+    global.openChat = (id) => setActiveChatId(id);
+    return () => delete global.openChat;
+  }, []);
+
   // ── Hardware back button ─────────────────────────────────────────────────
   React.useEffect(() => {
     const handleBackPress = () => {
@@ -290,6 +296,7 @@ const MainTabNavigator = () => {
     onBlogSeeAll:         openBlogsList,
     onKundaliPress:       () => { if (can('free_kundali')) setShowKundali(true); },
     onMatchingPress:      () => { if (can('kundali_matching')) setShowMatching(true); },
+    onPujaPress:          () => { if (can('puja')) setShowPujaList(true); },
     onPanchangPress:      () => setDummyScreenTitle('Panchang'),
     onHoroscopePress:     (sign) => { if (can('horoscope')) setActiveHoroSign(sign || 'default'); },
     onWalletPress:        () => openWallet('recharge'),
@@ -306,6 +313,7 @@ const MainTabNavigator = () => {
     onChatHistoryPress: () => { if (can('chat_history')) setShowChatHistory(true); },
     onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
     onAstrologerPress:  (astro) => setActiveAstrologer(astro),
+    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
     onWalletPress:      () => openWallet('recharge'),
     initialSearch:      chatInitialSearch,
     onSearchConsumed:   () => setChatInitialSearch(''),
@@ -318,6 +326,7 @@ const MainTabNavigator = () => {
     onMenuPress:        openDrawer,
     onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
     onAstrologerPress:  (astro) => setActiveAstrologer(astro),
+    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
     onWalletPress:      () => openWallet('recharge'),
     initialSearch:      chatInitialSearch,
     onSearchConsumed:   () => setChatInitialSearch(''),
