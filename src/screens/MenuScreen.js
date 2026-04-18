@@ -157,6 +157,30 @@ const ALL_MENU_ROWS = [
     permKey: 'settings',
     Icon: ({ c }) => <Ionicons name="settings-outline" size={22} color={c} />,
   },
+  {
+    label: 'Contact Us',
+    action: 'contactUs',
+    permKey: 'contact_us',
+    Icon: ({ c }) => <Ionicons name="chatbubbles-outline" size={22} color={c} />,
+  },
+  {
+    label: 'About AstroGuru',
+    action: 'aboutUs',
+    permKey: 'about_us',
+    Icon: ({ c }) => <Ionicons name="information-circle-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Privacy Policy',
+    action: 'privacyPolicy',
+    permKey: 'privacy_policy',
+    Icon: ({ c }) => <Ionicons name="shield-checkmark-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Terms & Conditions',
+    action: 'termsAndConditions',
+    permKey: 'terms_and_conditions',
+    Icon: ({ c }) => <Ionicons name="document-text-outline" size={22} color={c} />,
+  },
 ];
 
 const SOCIAL_LINKS = [
@@ -187,6 +211,10 @@ const MenuScreen = ({
   onReferEarnPress,
   onAstroServicesPress,
   onAstroShopPress,
+  onContactUsPress,
+  onAboutUsPress,
+  onPrivacyPress,
+  onTermsPress,
   onDummyPress,
 }) => {
   const { user } = useSelector((s) => s.auth);
@@ -215,6 +243,10 @@ const MenuScreen = ({
       case 'referEarn':    if (onReferEarnPress)     onReferEarnPress(); break;
       case 'astroServices':if (onAstroServicesPress) onAstroServicesPress(); break;
       case 'astroShop':   if (onAstroShopPress)     onAstroShopPress(); break;
+      case 'contactUs':    if (onContactUsPress)     onContactUsPress(); break;
+      case 'aboutUs':      if (onAboutUsPress)       onAboutUsPress(); break;
+      case 'privacyPolicy': if (onPrivacyPress)       onPrivacyPress(); break;
+      case 'termsAndConditions': if (onTermsPress)     onTermsPress(); break;
       case 'dummy':        if (onDummyPress)         onDummyPress(item.dummyTitle || item.label); break;
       default: if (onClose) onClose();
     }

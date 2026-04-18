@@ -32,6 +32,9 @@ import PujaListScreen           from '../screens/PujaListScreen';
 import ReferEarnScreen          from '../screens/ReferEarnScreen';
 import AstroServicesScreen      from '../screens/AstroServicesScreen';
 import AstroShopScreen          from '../screens/AstroShopScreen';
+import ContactUsScreen          from '../screens/ContactUsScreen';
+import StaticPageScreen         from '../screens/StaticPageScreen';
+import CallRoomScreen           from '../screens/CallRoomScreen';
 import BottomTabBar             from '../components/BottomTabBar';
 import { colors }               from '../theme/colors';
 import usePermissions           from '../hooks/usePermissions';
@@ -63,6 +66,8 @@ const MainTabNavigator = () => {
   const [showAstroShop,      setShowAstroShop]      = useState(false);
   const [activeAstrologer,   setActiveAstrologer]   = useState(null); // AstrologerDetailScreen
   const [drawerOpen,         setDrawerOpen]         = useState(false);
+  const [showContactUs,      setShowContactUs]      = useState(false);
+  const [activeStaticPage,   setActiveStaticPage]   = useState(null); // { slug, title }
   const [dummyScreenTitle,   setDummyScreenTitle]   = useState(null);
   const [chatInitialSearch,  setChatInitialSearch]  = useState('');
 
@@ -100,6 +105,8 @@ const MainTabNavigator = () => {
       if (showReferEarn)        { setShowReferEarn(false); return true; }
       if (showAstroServices)    { setShowAstroServices(false); return true; }
       if (showAstroShop)         { setShowAstroShop(false); return true; }
+      if (showContactUs)        { setShowContactUs(false); return true; }
+      if (activeStaticPage)     { setActiveStaticPage(null); return true; }
       if (activeAstrologer)     { setActiveAstrologer(null); return true; }
       if (activeTab !== 'Home') { setActiveTab('Home'); return true; }
       return false;
@@ -109,7 +116,7 @@ const MainTabNavigator = () => {
   }, [
     drawerOpen, activeBlog, showChatHistory, showCallHistory, activeChatId, activeCallId, showBlogsList,
     activeHoroSign, showKundali, showMatching, showWallet, showProfile,
-    editingProfile, activeTab, dummyScreenTitle,
+    editingProfile, activeTab, dummyScreenTitle, showContactUs, activeStaticPage,
     showOrderHistory, showFollowing, showPujaList, showReferEarn, showAstroServices, showAstroShop, activeAstrologer,
   ]);
 
@@ -217,8 +224,22 @@ const MainTabNavigator = () => {
   };
 
   const callProps = {
-    onCallPress:        () => { 
-      import('react-native').then(rn => rn.Alert.alert('Coming Soon', 'This feature is coming soon!'));
+    onCallPress: async (astro) => {
+      if (!astro) return;
+      try {
+        const { callApi } = await import('../api/services');
+        const res = await callApi.addRequest({ astrologerId: astro.id, callType: 'Audio' });
+        const callId = res.data?.recordList?.id || res.data?.data?.id || res.data?.id;
+        if (callId) {
+          setActiveCallId(callId);
+        } else {
+          const Toast = (await import('react-native-toast-message')).default;
+          Toast.show({ type: 'error', text1: 'Failed to start call', text2: res.data?.message || 'Please try again.' });
+        }
+      } catch (e) {
+        const Toast = (await import('react-native-toast-message')).default;
+        Toast.show({ type: 'error', text1: 'Call Error', text2: e.response?.data?.message || 'Unable to start call.' });
+      }
     },
     onMenuPress:        openDrawer,
     onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
@@ -245,10 +266,10 @@ const MainTabNavigator = () => {
         onOpenChat={(id) => { setShowProfile(false); setActiveChatId(id); }}
         onChatHistory={() => { setShowProfile(false); setShowChatHistory(true); }}
         onReferEarn={() => { setShowProfile(false); setShowReferEarn(true); }}
-        onHelpSupport={() => { setShowProfile(false); setDummyScreenTitle('Help & Support'); }}
-        onAbout={() => { setShowProfile(false); setDummyScreenTitle('About Us'); }}
-        onTerms={() => { setShowProfile(false); setDummyScreenTitle('Terms & Conditions'); }}
-        onPrivacy={() => { setShowProfile(false); setDummyScreenTitle('Privacy Policy'); }}
+        onHelpSupport={() => { setShowProfile(false); setActiveStaticPage({ slug: 'help-support', title: 'Help & Support' }); }}
+        onAbout={() => { setShowProfile(false); setActiveStaticPage({ slug: 'about-us', title: 'About Us' }); }}
+        onTerms={() => { setShowProfile(false); setActiveStaticPage({ slug: 'terms-condition', title: 'Terms & Conditions' }); }}
+        onPrivacy={() => { setShowProfile(false); setActiveStaticPage({ slug: 'privacy-policy', title: 'Privacy Policy' }); }}
         onBack={() => setShowProfile(false)}
       />
     );
@@ -271,8 +292,7 @@ const MainTabNavigator = () => {
     );
   }
   if (activeCallId) {
-    // Navigate to call screen — pass callId so CallScreen can join the room
-    return <CallScreen callId={activeCallId} onBack={() => setActiveCallId(null)} {...callProps} />;
+    return <CallRoomScreen callId={activeCallId} onBack={() => setActiveCallId(null)} />;
   }
   if (activeChatId) {
     return <ChatRoomScreen chatId={activeChatId} onBack={() => setActiveChatId(null)} />;
@@ -327,6 +347,18 @@ const MainTabNavigator = () => {
   }
   if (showAstroShop && can('astromall')) {
     return <AstroShopScreen onBack={() => setShowAstroShop(false)} />;
+  }
+  if (showContactUs) {
+    return <ContactUsScreen onBack={() => setShowContactUs(false)} />;
+  }
+  if (activeStaticPage) {
+    return (
+      <StaticPageScreen 
+        slug={activeStaticPage.slug} 
+        title={activeStaticPage.title} 
+        onBack={() => setActiveStaticPage(null)} 
+      />
+    );
   }
   if (activeAstrologer) {
     return (
@@ -417,6 +449,11 @@ const MainTabNavigator = () => {
           onReferEarnPress={() => { closeDrawerNow(); setShowReferEarn(true); }}
           onAstroServicesPress={() => { closeDrawerNow(); setShowAstroServices(true); }}
           onAstroShopPress={() => { closeDrawerNow(); setShowAstroShop(true); }}
+          onContactUsPress={() => { if (can('contact_us')) { closeDrawerNow(); setShowContactUs(true); } }}
+          onAboutUsPress={() => { if (can('about_us')) { closeDrawerNow(); setActiveStaticPage({ slug: 'about-us', title: 'About Us' }); } }}
+          onPrivacyPress={() => { if (can('privacy_policy')) { closeDrawerNow(); setActiveStaticPage({ slug: 'privacy-policy', title: 'Privacy Policy' }); } }}
+          onTermsPress={() => { if (can('terms_and_conditions')) { closeDrawerNow(); setActiveStaticPage({ slug: 'terms-condition', title: 'Terms & Conditions' }); } }}
+          onHelpSupportPress={() => { closeDrawerNow(); setActiveStaticPage({ slug: 'help-support', title: 'Help & Support' }); }}
           onDummyPress={(title) => {
             closeDrawerNow(); setDummyScreenTitle(title);
           }}

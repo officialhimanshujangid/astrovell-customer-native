@@ -31,5 +31,9 @@
   "redeem_gift_card": true,
   "my_following": true,
   "free_services": true,
-  "settings": true
+  "settings": true,
+  "contact_us": true,
+  "about_us": true,
+  "privacy_policy": true,
+  "terms_and_conditions": true
 }

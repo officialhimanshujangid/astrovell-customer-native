@@ -148,10 +148,10 @@ const ProfileScreen = ({
     {
       section: 'Privacy & Support',
       items: [
-        { icon: 'lock-closed-outline',  iconLib: 'ion', label: 'Privacy Policy',    sub: 'How we use your data',      action: 'privacy' },
-        { icon: 'document-text-outline', iconLib: 'ion', label: 'Terms & Conditions', sub: 'App usage terms',           action: 'terms' },
+        { icon: 'lock-closed-outline',  iconLib: 'ion', label: 'Privacy Policy',    sub: 'How we use your data',      action: 'privacy', permKey: 'privacy_policy' },
+        { icon: 'document-text-outline', iconLib: 'ion', label: 'Terms & Conditions', sub: 'App usage terms',           action: 'terms', permKey: 'terms_and_conditions' },
         { icon: 'headset-outline',  iconLib: 'ion',     label: 'Help & Support',    sub: 'FAQs & contact us',          action: 'help',    permKey: 'help_support' },
-        { icon: 'information-circle-outline', iconLib: 'ion', label: 'About',        sub: 'Version 1.0.0',              action: 'about' },
+        { icon: 'information-circle-outline', iconLib: 'ion', label: 'About',        sub: 'Version 1.0.0',              action: 'about', permKey: 'about_us' },
       ],
     },
   ];
