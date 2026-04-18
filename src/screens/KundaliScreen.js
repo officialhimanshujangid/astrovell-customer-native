@@ -9,6 +9,7 @@ import axios from 'axios';
 import apiClient from '../api/apiClient';
 import { colors } from '../theme/colors';
 import KundaliChart from '../components/KundaliChart';
+import Toast from 'react-native-toast-message';
 
 const KundaliScreen = ({ onBack }) => {
   const { token } = useSelector(s => s.auth);
@@ -71,11 +72,11 @@ const KundaliScreen = ({ onBack }) => {
 
   const handleSubmit = async () => {
     if (!form.name || !form.birthDate || !form.birthTime || !form.birthPlace) {
-      Alert.alert('Incomplete', 'Please fill all fields');
+      Toast.show({ type: 'error', text1: 'Incomplete', text2: 'Please fill all fields' });
       return;
     }
     if (!form.latitude || !form.longitude) {
-      Alert.alert('Location Error', 'Location not found. Please enter a more specific city Name.');
+      Toast.show({ type: 'error', text1: 'Location Error', text2: 'Location not found. Please enter a more specific city Name.' });
       return;
     }
 
@@ -120,7 +121,7 @@ const KundaliScreen = ({ onBack }) => {
       }
     } catch (err) {
       console.log('--- Kundali Error ---', err.response?.data || err.message);
-      Alert.alert('Error', err.response?.data?.message || err.message || 'Failed to generate kundali');
+      Toast.show({ type: 'error', text1: 'Error', text2: err.response?.data?.message || err.message || 'Failed to generate kundali' });
     }
     setLoading(false);
   };

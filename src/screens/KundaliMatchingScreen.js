@@ -8,6 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import apiClient from '../api/apiClient';
 import { colors } from '../theme/colors';
+import Toast from 'react-native-toast-message';
 
 const KundaliMatchingScreen = ({ onBack }) => {
   const { token } = useSelector(s => s.auth);
@@ -66,11 +67,11 @@ const KundaliMatchingScreen = ({ onBack }) => {
   const handleSubmit = async () => {
     if (!boy.name || !boy.dateOfBirth || !boy.timeOfBirth || !boy.placeOfBirth ||
         !girl.name || !girl.dateOfBirth || !girl.timeOfBirth || !girl.placeOfBirth) {
-      Alert.alert('Incomplete', 'Please fill all fields for both Boy and Girl');
+      Toast.show({ type: 'error', text1: 'Incomplete', text2: 'Please fill all fields for both Boy and Girl' });
       return;
     }
     if (!boy.latitude || !girl.latitude) {
-      Alert.alert('Location Error', 'Location not found for one or both. Please try more specific place names.');
+      Toast.show({ type: 'error', text1: 'Location Error', text2: 'Location not found for one or both. Please try more specific place names.' });
       return;
     }
 
@@ -111,7 +112,7 @@ const KundaliMatchingScreen = ({ onBack }) => {
 
     } catch (err) {
       console.log('--- Kundali Match Error ---', err.response?.data || err.message);
-      Alert.alert('Error', err.response?.data?.message || err.message || 'Failed to generate matching report');
+      Toast.show({ type: 'error', text1: 'Error', text2: err.response?.data?.message || err.message || 'Failed to generate matching report' });
     }
     setLoading(false);
   };

@@ -13,6 +13,7 @@ import {
 } from '../api/services';
 import { imgUrl } from '../store/slices/homeSlice';
 import { colors } from '../theme/colors';
+import Toast from 'react-native-toast-message';
 
 const DURATION_OPTIONS = [
   { label: '5 min',   value: 5  },
@@ -66,7 +67,7 @@ const IntakeModal = ({ visible, astro, intakeType, onClose, onSuccess }) => {
 
   const handleSubmit = async () => {
     if (!form.name || !form.birthDate || !form.gender || !form.topicOfConcern) {
-      Alert.alert('Required', 'Please fill name, gender, date of birth, and topic of concern');
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Please fill name, gender, date of birth, and topic of concern' });
       return;
     }
     setSubmitting(true);
@@ -76,10 +77,11 @@ const IntakeModal = ({ visible, astro, intakeType, onClose, onSuccess }) => {
       const wallet = balRes.data?.recordList || balRes.data?.data;
       const balance = parseFloat(wallet?.amount || 0);
       if (balance < totalCost) {
-        Alert.alert(
-          'Insufficient Balance',
-          `You need ₹${totalCost} but have ₹${balance.toFixed(2)}. Please recharge your wallet.`,
-        );
+        Toast.show({
+          type: 'error',
+          text1: 'Insufficient Balance',
+          text2: `You need ₹${totalCost} but have ₹${balance.toFixed(2)}. Please recharge your wallet.`
+        });
         setSubmitting(false);
         return;
       }
@@ -111,14 +113,14 @@ const IntakeModal = ({ visible, astro, intakeType, onClose, onSuccess }) => {
 
       if (res.data?.status === 200) {
         const label = intakeType === 'chat' ? 'Chat' : intakeType === 'video' ? 'Video Call' : 'Call';
-        Alert.alert('Request Sent!', `${label} request sent successfully. The astrologer will connect with you shortly.`);
+        Toast.show({ type: 'success', text1: 'Request Sent! 🎉', text2: `${label} request sent successfully. The astrologer will connect with you shortly.` });
         onSuccess && onSuccess(res.data?.recordList?.id || res.data?.callId, intakeType);
         onClose();
       } else {
-        Alert.alert('Error', res.data?.message || 'Request failed');
+        Toast.show({ type: 'error', text1: 'Error', text2: res.data?.message || 'Request failed' });
       }
     } catch (e) {
-      Alert.alert('Error', e?.response?.data?.message || 'Something went wrong');
+      Toast.show({ type: 'error', text1: 'Error', text2: e?.response?.data?.message || 'Something went wrong' });
     }
     setSubmitting(false);
   };
@@ -234,7 +236,7 @@ const ReportModal = ({ visible, astro, onClose }) => {
 
   const handleSubmit = async () => {
     if (!form.firstName || !form.gender || !form.birthDate) {
-      Alert.alert('Required', 'Please fill first name, gender, and date of birth');
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Please fill first name, gender, and date of birth' });
       return;
     }
     setSubmitting(true);
@@ -246,13 +248,13 @@ const ReportModal = ({ visible, astro, onClose }) => {
         reportRate: astro.reportRate || 0,
       });
       if (res.data?.status === 200) {
-        Alert.alert('Success', 'Report requested successfully!');
+        Toast.show({ type: 'success', text1: 'Success', text2: 'Report requested successfully!' });
         onClose();
       } else {
-        Alert.alert('Error', res.data?.message || 'Failed to request report');
+        Toast.show({ type: 'error', text1: 'Error', text2: res.data?.message || 'Failed to request report' });
       }
     } catch (e) {
-      Alert.alert('Error', e?.response?.data?.message || 'Failed');
+      Toast.show({ type: 'error', text1: 'Error', text2: e?.response?.data?.message || 'Failed' });
     }
     setSubmitting(false);
   };

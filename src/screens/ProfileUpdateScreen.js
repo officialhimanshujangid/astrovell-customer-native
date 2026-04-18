@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateProfile, clearUpdateError, getProfile } from '../store/slices/authSlice';
 import { DatePickerModal, TimePickerModal } from '../components/DateTimePicker';
 import { colors } from '../theme/colors';
+import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 const GENDER_OPTIONS = ['Male', 'Female', 'Other'];
@@ -139,11 +140,11 @@ const ProfileUpdateScreen = ({ onBack }) => {
   const progressPct = `${Math.round((filledCount / 6) * 100)}%`;
 
   const validate = () => {
-    if (!form.name.trim())       { Alert.alert('Required', 'Please enter your full name');          return false; }
-    if (!form.gender)            { Alert.alert('Required', 'Please select your gender');            return false; }
-    if (!form.birthDate.trim())  { Alert.alert('Required', 'Please pick your birth date');          return false; }
-    if (!form.birthTime.trim())  { Alert.alert('Required', 'Please pick your birth time');          return false; }
-    if (!form.birthPlace.trim()) { Alert.alert('Required', 'Please enter your birth place');        return false; }
+    if (!form.name.trim())       { Toast.show({ type: 'error', text1: 'Required', text2: 'Please enter your full name' });          return false; }
+    if (!form.gender)            { Toast.show({ type: 'error', text1: 'Required', text2: 'Please select your gender' });            return false; }
+    if (!form.birthDate.trim())  { Toast.show({ type: 'error', text1: 'Required', text2: 'Please pick your birth date' });          return false; }
+    if (!form.birthTime.trim())  { Toast.show({ type: 'error', text1: 'Required', text2: 'Please pick your birth time' });          return false; }
+    if (!form.birthPlace.trim()) { Toast.show({ type: 'error', text1: 'Required', text2: 'Please enter your birth place' });        return false; }
     return true;
   };
 
@@ -160,7 +161,7 @@ const ProfileUpdateScreen = ({ onBack }) => {
     };
     const result = await dispatch(updateProfile(payload));
     if (updateProfile.rejected.match(result)) {
-      Alert.alert('Update Failed', result.payload?.message || 'Something went wrong.');
+      Toast.show({ type: 'error', text1: 'Update Failed', text2: result.payload?.message || 'Something went wrong.' });
     }
     // On success: profileComplete → true → Navigator auto-routes to Home
   };

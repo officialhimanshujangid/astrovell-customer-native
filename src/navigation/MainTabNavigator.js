@@ -158,6 +158,77 @@ const MainTabNavigator = () => {
     setDrawerOpen(false);
   };
 
+  // ── Navigation helpers ───────────────────────────────────────────────────
+  const goToTab = (tab) => setActiveTab(tab);
+
+  // Open a single blog post
+  const openBlog = (blog) => {
+    if (can('blogs')) setActiveBlog(blog);
+  };
+
+  // Open blog list (from home "Blog" quick-service or sidebar)
+  const openBlogsList = () => {
+    if (can('blogs')) setShowBlogsList(true);
+  };
+
+  // Called when user taps an astrologer from the home search bar
+  const openChatWithSearch = (astro) => {
+    if (can('chat')) {
+      setChatInitialSearch(astro?.name || '');
+      setActiveTab('Chat');
+    }
+  };
+
+  // Open wallet on a specific tab ('recharge' or 'history')
+  const openWallet = (tab = 'recharge') => {
+    if (can('wallet')) { setWalletInitialTab(tab); setShowWallet(true); }
+  };
+
+  // ── Props forwarded to HomeScreen ────────────────────────────────────────
+  const homeProps = {
+    onChatPress:          () => { if (can('chat')) goToTab('Chat'); },
+    onCallPress:          () => { if (can('call')) goToTab('Call'); },
+    onBlogPress:          openBlog,
+    onBlogListPress:      openBlogsList,
+    onBlogSeeAll:         openBlogsList,
+    onKundaliPress:       () => { if (can('free_kundali')) setShowKundali(true); },
+    onMatchingPress:      () => { if (can('kundali_matching')) setShowMatching(true); },
+    onPujaPress:          () => { if (can('puja')) setShowPujaList(true); },
+    onPanchangPress:      () => setDummyScreenTitle('Panchang'),
+    onHoroscopePress:     (sign) => { if (can('horoscope')) setActiveHoroSign(sign || 'default'); },
+    onWalletPress:        () => openWallet('recharge'),
+    onMenuPress:          openDrawer,
+    onProfilePress:       () => { if (can('profile')) setShowProfile(true); },
+    onAstrologerSearch:   openChatWithSearch,            // home search → chat tab
+    onAstrologerPress:    (astro) => setActiveAstrologer(astro), // card tap → detail screen
+  };
+
+  // ── Props forwarded to ChatScreen ────────────────────────────────────────
+  const chatProps = {
+    onStartChat:        (id) => setActiveChatId(id),
+    onMenuPress:        openDrawer,
+    onChatHistoryPress: () => { if (can('chat_history')) setShowChatHistory(true); },
+    onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
+    onAstrologerPress:  (astro) => setActiveAstrologer(astro),
+    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
+    onWalletPress:      () => openWallet('recharge'),
+    initialSearch:      chatInitialSearch,
+    onSearchConsumed:   () => setChatInitialSearch(''),
+  };
+
+  const callProps = {
+    onCallPress:        () => { 
+      import('react-native').then(rn => rn.Alert.alert('Coming Soon', 'This feature is coming soon!'));
+    },
+    onMenuPress:        openDrawer,
+    onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
+    onAstrologerPress:  (astro) => setActiveAstrologer(astro),
+    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
+    onWalletPress:      () => openWallet('recharge'),
+    initialSearch:      chatInitialSearch,
+    onSearchConsumed:   () => setChatInitialSearch(''),
+  };
+
   // ── Full-screen overlay stack ─────────────────────────────────────────────
 
   if (dummyScreenTitle) {
@@ -172,6 +243,13 @@ const MainTabNavigator = () => {
         onEditProfile={() => { setShowProfile(false); setEditingProfile(true); }}
         onWallet={() => { setShowProfile(false); openWallet('recharge'); }}
         onOpenChat={(id) => { setShowProfile(false); setActiveChatId(id); }}
+        onChatHistory={() => { setShowProfile(false); setShowChatHistory(true); }}
+        onReferEarn={() => { setShowProfile(false); setShowReferEarn(true); }}
+        onHelpSupport={() => { setShowProfile(false); setDummyScreenTitle('Help & Support'); }}
+        onAbout={() => { setShowProfile(false); setDummyScreenTitle('About Us'); }}
+        onTerms={() => { setShowProfile(false); setDummyScreenTitle('Terms & Conditions'); }}
+        onPrivacy={() => { setShowProfile(false); setDummyScreenTitle('Privacy Policy'); }}
+        onBack={() => setShowProfile(false)}
       />
     );
   }
@@ -261,76 +339,7 @@ const MainTabNavigator = () => {
     );
   }
 
-  // ── Navigation helpers ───────────────────────────────────────────────────
-  const goToTab = (tab) => setActiveTab(tab);
 
-  // Open a single blog post
-  const openBlog = (blog) => {
-    if (can('blogs')) setActiveBlog(blog);
-  };
-
-  // Open blog list (from home "Blog" quick-service or sidebar)
-  const openBlogsList = () => {
-    if (can('blogs')) setShowBlogsList(true);
-  };
-
-  // Called when user taps an astrologer from the home search bar
-  const openChatWithSearch = (astro) => {
-    if (can('chat')) {
-      setChatInitialSearch(astro?.name || '');
-      setActiveTab('Chat');
-    }
-  };
-
-  // Open wallet on a specific tab ('recharge' or 'history')
-  const openWallet = (tab = 'recharge') => {
-    if (can('wallet')) { setWalletInitialTab(tab); setShowWallet(true); }
-  };
-
-  // ── Props forwarded to HomeScreen ────────────────────────────────────────
-  const homeProps = {
-    onChatPress:          () => { if (can('chat')) goToTab('Chat'); },
-    onCallPress:          () => { if (can('call')) goToTab('Call'); },
-    onBlogPress:          openBlog,
-    onBlogListPress:      openBlogsList,
-    onBlogSeeAll:         openBlogsList,
-    onKundaliPress:       () => { if (can('free_kundali')) setShowKundali(true); },
-    onMatchingPress:      () => { if (can('kundali_matching')) setShowMatching(true); },
-    onPujaPress:          () => { if (can('puja')) setShowPujaList(true); },
-    onPanchangPress:      () => setDummyScreenTitle('Panchang'),
-    onHoroscopePress:     (sign) => { if (can('horoscope')) setActiveHoroSign(sign || 'default'); },
-    onWalletPress:        () => openWallet('recharge'),
-    onMenuPress:          openDrawer,
-    onProfilePress:       () => { if (can('profile')) setShowProfile(true); },
-    onAstrologerSearch:   openChatWithSearch,            // home search → chat tab
-    onAstrologerPress:    (astro) => setActiveAstrologer(astro), // card tap → detail screen
-  };
-
-  // ── Props forwarded to ChatScreen ────────────────────────────────────────
-  const chatProps = {
-    onStartChat:        (id) => setActiveChatId(id),
-    onMenuPress:        openDrawer,
-    onChatHistoryPress: () => { if (can('chat_history')) setShowChatHistory(true); },
-    onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
-    onAstrologerPress:  (astro) => setActiveAstrologer(astro),
-    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
-    onWalletPress:      () => openWallet('recharge'),
-    initialSearch:      chatInitialSearch,
-    onSearchConsumed:   () => setChatInitialSearch(''),
-  };
-
-  const callProps = {
-    onCallPress:        () => { 
-      import('react-native').then(rn => rn.Alert.alert('Coming Soon', 'This feature is coming soon!'));
-    },
-    onMenuPress:        openDrawer,
-    onCallHistoryPress: () => { if (can('call')) setShowCallHistory(true); },
-    onAstrologerPress:  (astro) => setActiveAstrologer(astro),
-    onProfilePress:     () => { if (can('profile')) setShowProfile(true); },
-    onWalletPress:      () => openWallet('recharge'),
-    initialSearch:      chatInitialSearch,
-    onSearchConsumed:   () => setChatInitialSearch(''),
-  };
 
   // ── Render the active tab screen ─────────────────────────────────────────
   const renderScreen = () => {

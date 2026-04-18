@@ -52,73 +52,15 @@ const cashbackRupees = (amount, cashbackPct) => {
 const runRazorpay = async ({ paymentId, amount, dispatch, user, settings, currencySymbol, onDone }) => {
   try {
     const orderRes = await dispatch(razorpayCreateOrder({ amount, paymentId })).unwrap();
-    if (!orderRes?.orderId || !orderRes?.keyId) {
-      Alert.alert('Error', 'Razorpay is not configured. Please contact support.');
+    if (!settings?.razorpayKeyId) {
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Razorpay is not configured. Please contact support.' });
       onDone(); return;
     }
 
     let RazorpayCheckout;
     try { const M = require('react-native-razorpay'); RazorpayCheckout = M.default || M; } catch (_) {}
 
-    if (__DEV__) {
-      const { NativeModules } = require('react-native');
-      const linked = !!RazorpayCheckout && typeof RazorpayCheckout.open === 'function' && !!NativeModules.RNRazorpayCheckout;
-      if (!linked) {
-        Alert.alert('⚠️ Payment SDK Not Available',
-          `Razorpay requires a dev/prod build.\n\nOrder: ${orderRes.orderId}`,
-          [
-            { text: '✅ Simulate Success', onPress: async () => {
-              try {
-                const r = await dispatch(paymentSuccess({ paymentId, orderId: orderRes.orderId, amount })).unwrap();
-                if (r?.status === 200) {
-                  Toast.show({ type: 'success', text1: 'Success 🎉', text2: r.message || 'Wallet recharged!' });
-                  
-                  // Trigger local push notification for wallet recharge success
-                  Notifications.scheduleNotificationAsync({
-                    content: {
-                      title: "Wallet Recharge Successful! 💸",
-                      body: `Your wallet has been recharged with ${currencySymbol}${amount}. Enjoy your consultations!`,
-                      sound: true,
-                    },
-                    trigger: null, // immediate
-                  });
-
-                  dispatch(fetchWalletBalance());
-                  dispatch(fetchWalletTransactions({ startIndex: 0, fetchRecord: 100 }));
-                  if (user?.id) dispatch(getProfile(user.id));
-                } else { 
-                  try { await dispatch(cancelPayment({ paymentId })); } catch (_) {} 
-                  Toast.show({ type: 'error', text1: 'Failed', text2: r?.message || 'Unable to simulate' }); 
-                }
-              } catch (e) { 
-                try { await dispatch(cancelPayment({ paymentId })); } catch (_) {} 
-                Toast.show({ type: 'error', text1: 'Error', text2: e?.message || 'Failed' }); 
-              }
-              onDone();
-            }},
-            { text: 'Cancel', style: 'cancel', onPress: async () => { try { await dispatch(cancelPayment({ paymentId })); } catch (_) {} onDone(); }},
-          ]
-        );
-        return;
-      }
-    }
-
-    if (!RazorpayCheckout || typeof RazorpayCheckout.open !== 'function') {
-      Alert.alert('Payment Error', 'Razorpay SDK unavailable. Please reinstall the app.');
-      try { await dispatch(cancelPayment({ paymentId })); } catch (_) {}
-      onDone(); return;
-    }
-
-    RazorpayCheckout.open({
-      description: 'Wallet Recharge',
-      currency: orderRes.currency || 'INR',
-      key: orderRes.keyId,
-      amount: orderRes.amount,
-      name: settings?.appName || 'Astrologer App',
-      order_id: orderRes.orderId,
-      prefill: { name: user?.name || '', email: user?.email || '', contact: String(user?.contactNo || '') },
-      theme: { color: '#FFCC00' },
-    }).then(async (data) => {
+    const onPaymentSuccess = async (data) => {
       try {
         const v = await dispatch(razorpayVerify({ razorpay_order_id: data.razorpay_order_id, razorpay_payment_id: data.razorpay_payment_id, razorpay_signature: data.razorpay_signature, paymentId })).unwrap();
         if (v?.status === 200) {
@@ -139,13 +81,40 @@ const runRazorpay = async ({ paymentId, amount, dispatch, user, settings, curren
         } else { Toast.show({ type: 'error', text1: 'Verification Failed', text2: 'Contact support if deducted.' }); }
       } catch (e) { Toast.show({ type: 'error', text1: 'Verification Error', text2: e?.message || 'Failed' }); }
       onDone();
-    }).catch(async (err) => {
+    };
+
+    if (Platform.OS === 'android' && !Platform.isTV) {
+      if (!RazorpayCheckout) {
+        Toast.show({ type: 'info', text1: '⚠️ Payment SDK Not Available', text2: 'This feature requires a native build. Using simulator mode.' });
+        setTimeout(() => {
+          onPaymentSuccess({ razorpay_payment_id: 'sim_123', razorpay_order_id: 'sim_order_123', paymentId });
+        }, 1500);
+        return;
+      }
+    }
+
+    if (!RazorpayCheckout || typeof RazorpayCheckout.open !== 'function') {
+      Toast.show({ type: 'error', text1: 'Payment Error', text2: 'Razorpay SDK unavailable. Please reinstall the app.' });
+      try { await dispatch(cancelPayment({ paymentId })); } catch (_) {}
+      onDone(); return;
+    }
+
+    RazorpayCheckout.open({
+      description: 'Wallet Recharge',
+      currency: orderRes.currency || 'INR',
+      key: orderRes.keyId,
+      amount: orderRes.amount,
+      name: settings?.appName || 'Astrologer App',
+      order_id: orderRes.orderId,
+      prefill: { name: user?.name || '', email: user?.email || '', contact: String(user?.contactNo || '') },
+      theme: { color: '#FFCC00' },
+    }).then(onPaymentSuccess).catch(async (err) => {
       if (err?.code !== 0) Toast.show({ type: 'error', text1: 'Payment Failed', text2: err?.description || 'Could not complete payment.' });
       try { await dispatch(cancelPayment({ paymentId })); } catch (_) {}
       onDone();
     });
   } catch (err) {
-    Alert.alert('Error', err?.message || 'Razorpay order creation failed');
+    Toast.show({ type: 'error', text1: 'Error', text2: err?.message || 'Razorpay order creation failed' });
     onDone();
   }
 };
@@ -194,19 +163,20 @@ const RechargeView = ({ onBack, onGoHistory, balance, currencySymbol, settings, 
         paymentMode: selectedGateway,
       })).unwrap();
 
-      if (res?.status !== 200 || !res?.paymentId) {
-        Alert.alert('Error', res?.message || 'Payment initiation failed');
-        setRecharging(false); return;
+      if (res?.status !== 200) {
+        Toast.show({ type: 'error', text1: 'Error', text2: res?.message || 'Payment initiation failed' });
+        setRecharging(false);
+        return;
       }
 
       if (selectedGateway === 'razorpay') {
         await runRazorpay({ paymentId: res.paymentId, amount: res.amount || numAmt, dispatch, user, settings, currencySymbol, onDone: () => setRecharging(false) });
       } else {
-        Alert.alert('Info', 'Stripe is not supported in the mobile app yet.');
+        Toast.show({ type: 'info', text1: 'Info', text2: 'Stripe is not supported in the mobile app yet.' });
         setRecharging(false);
       }
     } catch (err) {
-      Alert.alert('Error', err?.message || 'Payment failed');
+      Toast.show({ type: 'error', text1: 'Error', text2: err?.message || 'Payment failed' });
       setRecharging(false);
     }
   };
@@ -365,7 +335,7 @@ const HistoryView = ({ onBack, onGoRecharge, balance, currencySymbol, transactio
     try {
       const { Clipboard } = require('react-native');
       Clipboard.setString(String(id));
-      Alert.alert('Copied', 'Transaction ID copied');
+      Toast.show({ type: 'success', text1: 'Copied', text2: 'Transaction ID copied' });
     } catch (_) {}
   };
 

@@ -9,6 +9,7 @@ import DateTimePicker from '../components/DateTimePicker';
 import { astroApi } from '../api/services';
 import { colors } from '../theme/colors';
 import usePermissions from '../hooks/usePermissions';
+import Toast from 'react-native-toast-message';
 
 const TABS = [
   { key: 'numerology', label: 'Numerology', emoji: '🔢', free: true  },
@@ -53,25 +54,25 @@ const AstroServicesScreen = ({ onBack }) => {
     try {
       const res = await fn();
       if (res.data?.status === 200) setResult({ type: activeTab, data: res.data.recordList });
-      else Alert.alert('Error', res.data?.message || 'Request failed');
+      else Toast.show({ type: 'error', text1: 'Error', text2: res.data?.message || 'Request failed' });
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Something went wrong. Please try again.' });
     }
     setLoading(false);
   };
 
   const handleNumerology = () => {
-    if (!numName || !numDate) { Alert.alert('Required', 'Enter your name and date of birth'); return; }
+    if (!numName || !numDate) { Toast.show({ type: 'error', text1: 'Required', text2: 'Enter your name and date of birth' }); return; }
     call(() => astroApi.numerology({ name: numName, date: fmtDate(numDate) }));
   };
 
   const handleMuhurat = () => {
-    if (!muhDate) { Alert.alert('Required', 'Select a date'); return; }
+    if (!muhDate) { Toast.show({ type: 'error', text1: 'Required', text2: 'Select a date' }); return; }
     call(() => astroApi.muhurat({ date: fmtDate(muhDate) }));
   };
 
   const handleTransit = () => {
-    if (!transDob || !transTob) { Alert.alert('Required', 'Enter DOB and birth time'); return; }
+    if (!transDob || !transTob) { Toast.show({ type: 'error', text1: 'Required', text2: 'Enter DOB and birth time' }); return; }
     call(() => astroApi.transit({ dob: fmtDate(transDob), tob: transTob }));
   };
 
@@ -80,7 +81,7 @@ const AstroServicesScreen = ({ onBack }) => {
   };
 
   const handleRemedies = () => {
-    if (!remDob || !remTob) { Alert.alert('Required', 'Enter DOB and birth time'); return; }
+    if (!remDob || !remTob) { Toast.show({ type: 'error', text1: 'Required', text2: 'Enter DOB and birth time' }); return; }
     Alert.alert(
       'Confirm Purchase',
       'This will cost ₹149 from your wallet. Continue?',

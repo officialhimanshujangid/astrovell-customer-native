@@ -8,12 +8,14 @@ import {
   StatusBar,
   ActivityIndicator,
   Platform,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
-import { logout } from '../store/slices/authSlice';
+import { logout, setGlobalLang } from '../store/slices/authSlice';
 import { getChatHistory } from '../store/slices/chatSlice';
 import { colors } from '../theme/colors';
 import usePermissions from '../hooks/usePermissions';
@@ -93,19 +95,38 @@ const ChatHistorySection = ({ onOpenChat }) => {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat, onBack }) => {
+const ProfileScreen = ({ 
+  onEditProfile, onWallet, onOpenChat, onBack, 
+  onChatHistory, onReferEarn, onHelpSupport, onAbout, onTerms, onPrivacy
+}) => {
   const dispatch = useDispatch();
-  const { user, walletBalance, settings } = useSelector((s) => s.auth);
+  const { user, walletBalance, settings, globalLang } = useSelector((s) => s.auth);
   const curr = settings?.currencySymbol || '₹';
   const { can } = usePermissions();
   const [activeSection, setActiveSection] = useState(null);
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const handleLogout = () => dispatch(logout());
 
+  const handleLangSelect = (lang) => {
+    dispatch(setGlobalLang(lang));
+    setShowLangModal(false);
+  };
+
   const handleRowPress = (action) => {
+    if (!action) return;
     if (action === 'editProfile' && onEditProfile) onEditProfile();
     else if (action === 'wallet' && onWallet) onWallet();
-    else if (action === 'history') setActiveSection(activeSection === 'history' ? null : 'history');
+    else if (action === 'history') {
+      if (onChatHistory) onChatHistory();
+      else setActiveSection(activeSection === 'history' ? null : 'history');
+    }
+    else if (action === 'language') setShowLangModal(true);
+    else if (action === 'refer' && onReferEarn) onReferEarn();
+    else if (action === 'privacy' && onPrivacy) onPrivacy();
+    else if (action === 'terms' && onTerms) onTerms();
+    else if (action === 'help' && onHelpSupport) onHelpSupport();
+    else if (action === 'about' && onAbout) onAbout();
   };
 
   const ALL_PROFILE_ROWS = [
@@ -113,7 +134,7 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat, onBack }) => {
       section: 'Account',
       items: [
         { icon: 'edit-2',         iconLib: 'feather',  label: 'Edit Profile',         sub: 'Update your details',        action: 'editProfile',  permKey: 'profile_edit' },
-        { icon: 'globe',          iconLib: 'feather',  label: 'Language',              sub: 'English (Default)' },
+        { icon: 'globe',          iconLib: 'feather',  label: 'Language',              sub: globalLang === 'hi' ? 'Hindi' : 'English', action: 'language' },
       ],
     },
     {
@@ -121,16 +142,16 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat, onBack }) => {
       items: [
         { icon: 'wallet-outline', iconLib: 'ion',      label: 'My Wallet',             sub: 'Balance & recharge',         action: 'wallet',       permKey: 'profile_wallet' },
         { icon: 'chatbubble-ellipses-outline', iconLib: 'ion', label: 'Chat History', sub: 'Past sessions',               action: 'history' },
-        { icon: 'gift-outline',   iconLib: 'ion',      label: 'Refer & Earn',          sub: 'Invite friends, earn rewards', permKey: 'refer_and_earn' },
+        { icon: 'gift-outline',   iconLib: 'ion',      label: 'Refer & Earn',          sub: 'Invite friends, earn rewards', action: 'refer', permKey: 'refer_and_earn' },
       ],
     },
     {
       section: 'Privacy & Support',
       items: [
-        { icon: 'lock-closed-outline',  iconLib: 'ion', label: 'Privacy Policy',    sub: 'How we use your data' },
-        { icon: 'document-text-outline', iconLib: 'ion', label: 'Terms & Conditions', sub: 'App usage terms' },
-        { icon: 'headset-outline',  iconLib: 'ion',     label: 'Help & Support',    sub: 'FAQs & contact us',              permKey: 'help_support' },
-        { icon: 'information-circle-outline', iconLib: 'ion', label: 'About',        sub: 'Version 1.0.0' },
+        { icon: 'lock-closed-outline',  iconLib: 'ion', label: 'Privacy Policy',    sub: 'How we use your data',      action: 'privacy' },
+        { icon: 'document-text-outline', iconLib: 'ion', label: 'Terms & Conditions', sub: 'App usage terms',           action: 'terms' },
+        { icon: 'headset-outline',  iconLib: 'ion',     label: 'Help & Support',    sub: 'FAQs & contact us',          action: 'help',    permKey: 'help_support' },
+        { icon: 'information-circle-outline', iconLib: 'ion', label: 'About',        sub: 'Version 1.0.0',              action: 'about' },
       ],
     },
   ];
@@ -283,6 +304,40 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat, onBack }) => {
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Language Modal */}
+      <Modal visible={showLangModal} transparent animationType="slide" onRequestClose={() => setShowLangModal(false)}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={{ flex: 1 }} onPress={() => setShowLangModal(false)} />
+          <View style={styles.langSheet}>
+            <View style={styles.langHeader}>
+              <Text style={styles.langTitle}>Select Language</Text>
+              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowLangModal(false)}>
+                <Ionicons name="close" size={20} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.langOptions}>
+              {[
+                { id: 'en', name: 'English', icon: '🇺🇸' },
+                { id: 'hi', name: 'Hindi', icon: '🇮🇳' },
+              ].map((l) => (
+                <TouchableOpacity
+                  key={l.id}
+                  style={[styles.langOpt, globalLang === l.id && styles.langOptActive]}
+                  onPress={() => handleLangSelect(l.id)}
+                >
+                  <View style={styles.langOptLeft}>
+                    <Text style={styles.langIcon}>{l.icon}</Text>
+                    <Text style={styles.langText}>{l.name}</Text>
+                  </View>
+                  {globalLang === l.id && <Ionicons name="checkmark-circle" size={22} color={colors.goldDark} />}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -455,4 +510,33 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logoutText: { color: colors.error, fontSize: 15, fontWeight: '700' },
+
+  // Language Modal
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  langSheet: {
+    backgroundColor: '#FFF', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: 24, paddingBottom: 40,
+  },
+  langHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    marginBottom: 20,
+  },
+  langTitle: { fontSize: 18, fontWeight: '800', color: colors.text },
+  closeBtn: {
+    width: 32, height: 32, borderRadius: 16, backgroundColor: '#F5F5F5',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  langOptions: { gap: 12 },
+  langOpt: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: 16, borderRadius: 14, borderWidth: 1.5, borderColor: '#F0F0F0',
+    backgroundColor: '#FFF',
+  },
+  langOptActive: { borderColor: colors.gold, backgroundColor: colors.goldBg },
+  langOptLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  langIcon: { fontSize: 22, color: colors.goldDark, fontWeight: '600' },
+  langText: { fontSize: 16, fontWeight: '600', color: colors.textSecondary },
 });

@@ -16,6 +16,7 @@ import {
   Linking,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Toast from 'react-native-toast-message';
 import { io } from 'socket.io-client';
 import { colors } from '../theme/colors';
 import { imgUrl } from '../store/slices/homeSlice';
@@ -368,7 +369,7 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
     setTimeLeft(maxDur);
     startTimer();
 
-    Alert.alert('✅ Chat Accepted!', `${data?.astrologerName || 'Astrologer'} has accepted your chat request!`);
+    Toast.show({ type: 'success', text1: '✅ Chat Accepted!', text2: `${data?.astrologerName || 'Astrologer'} has accepted your chat request!` });
   };
 
   const handleChatRejected = (data) => {
@@ -407,7 +408,7 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
         })
         .catch(() => {
           setNewMessage(msgText);
-          Alert.alert('Error', 'Failed to send message');
+          Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to send message' });
         });
     }
     setSending(false);
@@ -496,7 +497,7 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      Alert.alert('Thank You! ⭐', 'Your review has been submitted.');
+      Toast.show({ type: 'success', text1: 'Thank You! ⭐', text2: 'Your review has been submitted.' });
     } catch (e) {}
     setRatingSubmitting(false);
     setShowRating(false);

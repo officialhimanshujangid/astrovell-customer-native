@@ -10,6 +10,7 @@ import { productApi } from '../api/services';
 import { imgUrl } from '../store/slices/homeSlice';
 import { colors } from '../theme/colors';
 import usePermissions from '../hooks/usePermissions';
+import Toast from 'react-native-toast-message';
 
 const stripHtml = (html = '') => html.replace(/<[^>]*>/g, '').trim();
 
@@ -92,7 +93,7 @@ const AstroShopScreen = ({ onBack }) => {
       `Add "${product.name}" (₹${product.price || product.amount || 0}) to your cart?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Buy Now', onPress: () => Alert.alert('Order Placed', 'Your order has been placed! You will receive a confirmation shortly.') },
+        { text: 'Buy Now', onPress: () => Toast.show({ type: 'success', text1: 'Order Placed', text2: 'Your order has been placed! You will receive a confirmation shortly.' }) },
       ]
     );
   };
