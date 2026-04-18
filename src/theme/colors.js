@@ -1,38 +1,57 @@
 export const colors = {
-  // Core backgrounds
-  primary: '#0f0a1e',       // Deep cosmic black-purple
-  secondary: '#1a1035',     // Dark indigo
-  surface: '#1e1650',       // Card surface
-  surfaceLight: '#2a2070',  // Lighter surface
+  // ── Core Backgrounds (AstroTalk: White + Warm Cream) ──────────────────────
+  primary: '#FFFFFF',        // Main screen background (white)
+  secondary: '#F7F7F7',        // Section background (very light gray)
+  surface: '#FFFFFF',        // Card surface (white)
+  surfaceLight: '#FFFBF0',        // Warm yellow-tinted surface
 
-  // Accent - Golden/Amber
-  gold: '#f5c842',
-  goldLight: '#fde68a',
-  goldDark: '#d97706',
-  goldGlow: 'rgba(245, 200, 66, 0.25)',
+  // ── Brand Yellow (AstroTalk signature) ───────────────────────────────────
+  gold: '#FFCC00',          // Primary yellow (AstroTalk brand)
+  goldLight: '#FFD95C',      // Lighter yellow highlight
+  goldDark: '#E6A800',       // Deeper amber (pressed / text on white)
+  goldGlow: '#FFFDE7',       // Very light yellow tint (used as bg on white)
+  goldBg: '#FFFBE6',         // Very light yellow background card fill
 
-  // Accent - Purple
+  // ── Accent ────────────────────────────────────────────────────────────────
+  accent: '#FF5722',        // CTA / highlights (orange-red)
+  accentLight: 'rgba(255,87,34,0.12)',
+  accentTeal: '#00BCD4',        // Teal for "Live" tab
+
+  // ── Text ─────────────────────────────────────────────────────────────────
+  text: '#1A1A1A',       // Primary dark text
+  textSecondary: '#555555',       // Secondary text
+  textMuted: '#888888',       // Placeholder / muted
+  textLight: '#BBBBBB',       // Very light text
+
+  // ── Semantic ─────────────────────────────────────────────────────────────
+  error: '#FF3B30',
+  errorBg: 'rgba(255,59,48,0.10)',
+  success: '#4CAF50',
+  successBg: 'rgba(76,175,80,0.12)',
+  warning: '#FF9500',
+  online: '#4CAF50',           // Online dot color
+
+  // ── Borders ──────────────────────────────────────────────────────────────
+  border: '#EEEEEE',
+  borderGold: 'rgba(255,204,0,0.40)',
+  borderStrong: '#DDDDDD',
+
+  // ── Header ───────────────────────────────────────────────────────────────
+  headerBg: '#FFFFFF',       // White header (AstroTalk style)
+  headerText: '#1A1A1A',       // Dark text on white header
+
+  // ── Bottom Tab ───────────────────────────────────────────────────────────
+  tabBg: '#FFFFFF',
+  tabActive: '#FFCC00',
+  tabInactive: '#AAAAAA',
+
+  // ── Chat button ──────────────────────────────────────────────────────────
+  chatBtnBg: '#FFCC00',       // Chat button background
+  callBtnBg: '#FFCC00',       // Call button background
+
+  // ── Legacy aliases ────────────────────────────────────────────────────────
   purple: '#7c3aed',
   purpleLight: '#a78bfa',
   purpleDark: '#4c1d95',
-  purpleGlow: 'rgba(124, 58, 237, 0.3)',
-
-  // Text
-  text: '#ffffff',
-  textSecondary: '#b8b0d8',
-  textMuted: '#6b63a3',
-
-  // Semantic
-  error: '#ff4c6a',
-  errorBg: 'rgba(255, 76, 106, 0.15)',
-  success: '#22c55e',
-  successBg: 'rgba(34, 197, 94, 0.15)',
-
-  // Borders
-  border: 'rgba(124, 58, 237, 0.35)',
-  borderGold: 'rgba(245, 200, 66, 0.4)',
-
-  // Gradients (used as reference)
-  gradientStart: '#0f0a1e',
-  gradientEnd: '#1a1035',
+  purpleGlow: 'rgba(124,58,237,0.3)',
 };

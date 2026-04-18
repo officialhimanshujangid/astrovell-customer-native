@@ -170,7 +170,7 @@ const KundaliMatchingScreen = ({ onBack }) => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
       
       {/* Header */}
       <View style={styles.header}>
@@ -200,7 +200,7 @@ const KundaliMatchingScreen = ({ onBack }) => {
         </View>
 
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.submitBtnText}>Match Kundali</Text>}
+          {loading ? <ActivityIndicator color="#1A1A1A" /> : <Text style={styles.submitBtnText}>Match Kundali</Text>}
         </TouchableOpacity>
 
         {/* ── Match Results ── */}
@@ -332,14 +332,14 @@ const KundaliMatchingScreen = ({ onBack }) => {
 export default KundaliMatchingScreen;
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.primary },
+  root: { flex: 1, backgroundColor: '#F7F7F7' },
   header: {
-    paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16,
-    backgroundColor: colors.secondary, flexDirection: 'row', alignItems: 'center',
-    borderBottomWidth: 1, borderBottomColor: colors.border, overflow: 'hidden', gap: 12
+    paddingHorizontal: 16, paddingTop: 48, paddingBottom: 12,
+    backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center',
+    borderBottomWidth: 1, borderBottomColor: '#F0F0F0', gap: 12,
   },
   headerOrb:  { position: 'absolute', right: -50, top: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: colors.gold, opacity: 0.05 },
-  backBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
+  backBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },
   backArrow:  { color: colors.text, fontSize: 18, fontWeight: '700' },
   headerTitle:{ flex: 1, color: colors.text, fontSize: 18, fontWeight: '800' },
 
@@ -347,25 +347,25 @@ const styles = StyleSheet.create({
   pageHero: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
   heroSub: { flex: 1, color: colors.textMuted, fontSize: 12, lineHeight: 18, paddingRight: 10 },
   
-  langToggle: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
+  langToggle: { flexDirection: 'row', backgroundColor: '#F5F5F5', borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: '#EBEBEB' },
   langBtn: { paddingVertical: 6, paddingHorizontal: 12 },
   langBtnActive: { backgroundColor: colors.gold },
   langText: { color: colors.textMuted, fontSize: 11, fontWeight: '700' },
-  langTextActive: { color: colors.primary },
+  langTextActive: { color: '#1A1A1A' },
 
-  personCard: { backgroundColor: colors.surface, padding: 18, borderRadius: 16, borderWidth: 1, borderColor: colors.border },
-  personHeader: { color: colors.gold, fontSize: 15, fontWeight: '800', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 8 },
+  personCard: { backgroundColor: colors.primary, padding: 18, borderRadius: 16, borderWidth: 1, borderColor: '#EFEFEF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1 },
+  personHeader: { color: colors.goldDark, fontSize: 15, fontWeight: '800', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F0F0F0', paddingBottom: 8 },
 
   label: { color: colors.textSecondary, fontSize: 11, fontWeight: '600', marginBottom: 8, marginTop: 12 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10,
-    borderWidth: 1, borderColor: colors.border,
+    backgroundColor: '#F8F8F8', borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#EBEBEB',
     color: colors.text, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14
   },
   pickerBtn: {
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10,
-    borderWidth: 1, borderColor: colors.border,
-    paddingHorizontal: 14, paddingVertical: 14, 
+    backgroundColor: '#F8F8F8', borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#EBEBEB',
+    paddingHorizontal: 14, paddingVertical: 14,
   },
   pickerText: { color: colors.text, fontSize: 14 },
   
@@ -377,41 +377,41 @@ const styles = StyleSheet.create({
   coordsText: { color: colors.success, fontSize: 10, marginTop: 6 },
 
   submitBtn: { backgroundColor: colors.gold, borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24, marginBottom: 12 },
-  submitBtnText: { color: colors.primary, fontSize: 15, fontWeight: '800' },
+  submitBtnText: { color: '#1A1A1A', fontSize: 15, fontWeight: '800' },
 
-  resultCard: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: colors.borderGold, marginTop: 12 },
-  resultTitle: { color: colors.gold, fontSize: 18, fontWeight: '800', marginBottom: 16, textAlign: 'center' },
+  resultCard: { backgroundColor: colors.primary, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: colors.borderGold, marginTop: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
+  resultTitle: { color: colors.goldDark, fontSize: 18, fontWeight: '800', marginBottom: 16, textAlign: 'center' },
   
-  scoreBoard: { backgroundColor: 'rgba(245,200,66,0.1)', paddingVertical: 20, alignItems: 'center', borderRadius: 14, marginBottom: 20 },
+  scoreBoard: { backgroundColor: colors.goldBg, paddingVertical: 20, alignItems: 'center', borderRadius: 14, marginBottom: 20, borderWidth: 1, borderColor: colors.borderGold },
   scoreText: { flexDirection: 'row', alignItems: 'baseline' },
-  scoreBig: { color: colors.gold, fontSize: 42, fontWeight: '800' },
+  scoreBig: { color: colors.goldDark, fontSize: 42, fontWeight: '800' },
   scoreTotal: { color: colors.textSecondary, fontSize: 20, fontWeight: '700' },
-  scoreLabel: { color: 'rgba(245,200,66,0.8)', fontSize: 13, fontWeight: '600', marginTop: 4 },
+  scoreLabel: { color: colors.textMuted, fontSize: 13, fontWeight: '600', marginTop: 4 },
 
-  breakdown: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 16, marginBottom: 16 },
-  kootRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', alignItems: 'center' },
+  breakdown: { backgroundColor: '#F9F9F9', borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#EFEFEF' },
+  kootRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F0F0F0', alignItems: 'center' },
   kootName: { color: colors.text, fontSize: 14, fontWeight: '700', textTransform: 'capitalize' },
   kootDesc: { color: colors.textMuted, fontSize: 11, marginTop: 3 },
-  kootScoreBox: { flexDirection: 'row', alignItems: 'baseline', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  kootScore: { color: colors.gold, fontSize: 15, fontWeight: '800' },
+  kootScoreBox: { flexDirection: 'row', alignItems: 'baseline', backgroundColor: colors.goldBg, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.borderGold },
+  kootScore: { color: colors.goldDark, fontSize: 15, fontWeight: '800' },
   kootTotal: { color: colors.textMuted, fontSize: 12, fontWeight: '600' },
 
-  conclusionBox: { backgroundColor: 'rgba(124,58,237,0.15)', borderWidth: 1, borderColor: 'rgba(124,58,237,0.4)', borderRadius: 12, padding: 16, marginBottom: 20 },
-  conclusionText: { color: colors.purpleLight, fontSize: 14, lineHeight: 22 },
+  conclusionBox: { backgroundColor: colors.goldBg, borderWidth: 1, borderColor: colors.borderGold, borderRadius: 12, padding: 16, marginBottom: 20 },
+  conclusionText: { color: colors.text, fontSize: 14, lineHeight: 22 },
 
-  manglikBox: { backgroundColor: colors.secondary, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: colors.border },
+  manglikBox: { backgroundColor: '#F9F9F9', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#EFEFEF' },
   manglikTitle: { color: colors.text, fontSize: 14, fontWeight: '700', marginBottom: 12 },
   manglikGrid: { flexDirection: 'row', gap: 12 },
-  manglikCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', padding: 14, borderRadius: 10, alignItems: 'center' },
+  manglikCard: { flex: 1, backgroundColor: colors.primary, padding: 14, borderRadius: 10, alignItems: 'center', borderWidth: 1, borderColor: '#EFEFEF' },
   manglikLabel: { color: colors.textMuted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
   manglikVal: { fontSize: 14, fontWeight: '800', textAlign: 'center' },
-  manglikDetails: { color: colors.gold, fontSize: 13, marginTop: 16, fontWeight: '700' },
-  listContainer: { marginTop: 6, backgroundColor: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 8 },
+  manglikDetails: { color: colors.goldDark, fontSize: 13, marginTop: 16, fontWeight: '700' },
+  listContainer: { marginTop: 6, backgroundColor: '#F5F5F5', padding: 12, borderRadius: 8 },
   listItem: { color: colors.textMuted, fontSize: 11, marginBottom: 4, lineHeight: 16 },
 
-  profileSummaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 12, marginBottom: 20 },
+  profileSummaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.goldBg, padding: 12, borderRadius: 12, marginBottom: 20, borderWidth: 1, borderColor: colors.borderGold },
   profileSummaryBox: { flex: 1, alignItems: 'center' },
-  profSumName: { color: colors.gold, fontSize: 13, fontWeight: '800', textTransform: 'capitalize', textAlign: 'center' },
+  profSumName: { color: colors.goldDark, fontSize: 13, fontWeight: '800', textTransform: 'capitalize', textAlign: 'center' },
   profSumLocation: { color: colors.textSecondary, fontSize: 9, marginTop: 4, textAlign: 'center' },
   hearts: { fontSize: 16, marginHorizontal: 8 }
 });

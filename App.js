@@ -9,6 +9,7 @@ import Constants from 'expo-constants';
 import { store, persistor } from './src/store/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import AppNavigator from './src/navigation/AppNavigator';
 
 // Ensure notifications show up when app is in foreground
@@ -67,8 +68,8 @@ async function registerForPushNotificationsAsync() {
 
 // Shown for a brief moment while AsyncStorage data is read on cold start
 const LoadingView = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a0533' }}>
-    <ActivityIndicator size="large" color="#f5c518" />
+  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
+    <ActivityIndicator size="large" color="#FFCC00" />
   </View>
 );
 
@@ -106,6 +107,7 @@ export default function App() {
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
+          <Toast />
         </SafeAreaProvider>
       </PersistGate>
     </Provider>

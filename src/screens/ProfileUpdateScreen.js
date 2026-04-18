@@ -184,7 +184,7 @@ const ProfileUpdateScreen = ({ onBack }) => {
       />
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+        <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
         <View style={styles.container}>
           {isRefreshing ? (
              <View style={styles.loadingWrap}>
@@ -194,13 +194,8 @@ const ProfileUpdateScreen = ({ onBack }) => {
              </View>
           ) : (
             <>
-
-          {/* Background stars */}
-          {STARS.map((s, i) => (
-            <View key={i} style={[styles.star, { top: s.top, left: s.left, width: s.size, height: s.size, opacity: s.opacity }]} />
-          ))}
-          <View style={styles.orbTop} />
-          <View style={styles.orbBottom} />
+          {/* Yellow accent bar at top */}
+          <View style={styles.topAccent} />
 
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
@@ -288,7 +283,7 @@ const ProfileUpdateScreen = ({ onBack }) => {
                 activeOpacity={0.85}
               >
                 {updateLoading ? (
-                  <ActivityIndicator color={colors.primary} />
+                  <ActivityIndicator color="#1A1A1A" />
                 ) : (
                   <>
                     <Text style={styles.submitText}>{onBack ? 'Save Changes' : 'Save & Continue'}</Text>
@@ -313,27 +308,25 @@ export default ProfileUpdateScreen;
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  loadingWrap: { flex: 1, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  loadingWrap: { flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
   loadingText: { color: colors.textSecondary, fontSize: 15, marginTop: 14 },
-  container: { flex: 1, backgroundColor: colors.primary },
-  star: { position: 'absolute', backgroundColor: '#ffffff', borderRadius: 10 },
-  orbTop: { position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: colors.gold, opacity: 0.08 },
-  orbBottom: { position: 'absolute', bottom: -100, left: -80, width: 280, height: 280, borderRadius: 140, backgroundColor: colors.purple, opacity: 0.12 },
+  container: { flex: 1, backgroundColor: '#F7F7F7' },
+  topAccent: { height: 5, backgroundColor: colors.gold, position: 'absolute', top: 0, left: 0, right: 0 },
   scroll: { paddingHorizontal: 20, paddingTop: 52, paddingBottom: 40 },
 
   header: { alignItems: 'center', marginBottom: 26 },
   backBtn: { alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 4, marginBottom: 8 },
-  backText: { color: colors.purpleLight, fontSize: 14, fontWeight: '600' },
-  avatarRing: { width: 88, height: 88, borderRadius: 44, borderWidth: 2, borderColor: colors.borderGold, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(245,200,66,0.08)', marginBottom: 16 },
-  avatarInner: { width: 70, height: 70, borderRadius: 35, backgroundColor: 'rgba(124,58,237,0.25)', alignItems: 'center', justifyContent: 'center' },
+  backText: { color: colors.goldDark, fontSize: 14, fontWeight: '600' },
+  avatarRing: { width: 88, height: 88, borderRadius: 44, borderWidth: 2, borderColor: colors.borderGold, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.goldBg, marginBottom: 16 },
+  avatarInner: { width: 70, height: 70, borderRadius: 35, backgroundColor: colors.goldGlow, alignItems: 'center', justifyContent: 'center' },
   avatarEmoji: { fontSize: 32 },
   title: { fontSize: 23, fontWeight: '800', color: colors.text, letterSpacing: 0.4, marginBottom: 8, textAlign: 'center' },
   subtitle: { fontSize: 13, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 },
 
-  card: { backgroundColor: colors.surface, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: colors.border, shadowColor: colors.purple, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 24, elevation: 10 },
+  card: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 22, borderWidth: 1, borderColor: '#EFEFEF', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 6 },
 
   progressContainer: { marginBottom: 22 },
-  progressTrack: { height: 6, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 3, overflow: 'hidden', marginBottom: 6 },
+  progressTrack: { height: 6, backgroundColor: '#F0F0F0', borderRadius: 3, overflow: 'hidden', marginBottom: 6 },
   progressFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 3 },
   progressText: { fontSize: 11, color: colors.textMuted, textAlign: 'right' },
 
@@ -344,27 +337,27 @@ const styles = StyleSheet.create({
   fieldWrapper: { marginBottom: 14 },
   fieldLabel: { fontSize: 12, fontWeight: '600', color: colors.textSecondary, marginBottom: 7, letterSpacing: 0.2 },
   required: { color: colors.error },
-  input: { backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 15, paddingVertical: 13, color: colors.text, fontSize: 15, fontWeight: '500' },
-  inputFocused: { borderColor: colors.purpleLight, backgroundColor: 'rgba(124,58,237,0.1)' },
-  inputDisabled: { opacity: 0.4, borderStyle: 'dashed' },
+  input: { backgroundColor: '#F8F8F8', borderWidth: 1.5, borderColor: '#EBEBEB', borderRadius: 12, paddingHorizontal: 15, paddingVertical: 13, color: colors.text, fontSize: 15, fontWeight: '500' },
+  inputFocused: { borderColor: colors.gold, backgroundColor: colors.goldBg },
+  inputDisabled: { opacity: 0.6, borderStyle: 'dashed' },
 
   // Picker button
-  pickerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1.5, borderColor: colors.borderGold, borderRadius: 12, paddingHorizontal: 15, paddingVertical: 14 },
+  pickerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.goldBg, borderWidth: 1.5, borderColor: colors.borderGold, borderRadius: 12, paddingHorizontal: 15, paddingVertical: 14 },
   pickerText: { color: colors.text, fontSize: 15, fontWeight: '600' },
   pickerArrow: { fontSize: 18 },
 
   genderRow: { flexDirection: 'row', gap: 10 },
-  genderBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.04)', alignItems: 'center' },
-  genderBtnActive: { borderColor: colors.gold, backgroundColor: colors.goldGlow },
+  genderBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: '#EBEBEB', backgroundColor: '#F8F8F8', alignItems: 'center' },
+  genderBtnActive: { borderColor: colors.gold, backgroundColor: colors.goldBg },
   genderText: { color: colors.textSecondary, fontSize: 13, fontWeight: '600' },
-  genderTextActive: { color: colors.gold, fontWeight: '700' },
+  genderTextActive: { color: colors.goldDark, fontWeight: '800' },
 
   errorBox: { backgroundColor: colors.errorBg, borderRadius: 10, padding: 12, marginBottom: 14, borderWidth: 1, borderColor: colors.error },
   errorText: { color: colors.error, fontSize: 13, textAlign: 'center' },
 
   submitBtn: { backgroundColor: colors.gold, borderRadius: 14, paddingVertical: 16, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 6, shadowColor: colors.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 },
   submitBtnDisabled: { opacity: 0.65 },
-  submitText: { color: colors.primary, fontSize: 17, fontWeight: '800', letterSpacing: 0.4 },
+  submitText: { color: '#1A1A1A', fontSize: 17, fontWeight: '800', letterSpacing: 0.4 },
   submitIcon: { fontSize: 18 },
   hint: { textAlign: 'center', color: colors.textMuted, fontSize: 11, marginTop: 16, letterSpacing: 0.8 },
 });

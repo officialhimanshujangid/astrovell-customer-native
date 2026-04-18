@@ -197,14 +197,14 @@ const styles = StyleSheet.create({
   },
   modal: {
     width: '100%',
-    backgroundColor: colors.surface,
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.purple,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
+    borderColor: '#EFEFEF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 16,
   },
@@ -226,11 +226,11 @@ const styles = StyleSheet.create({
   fieldLabel: { color: colors.textMuted, fontSize: 11, fontWeight: '600', marginBottom: 8, textTransform: 'uppercase' },
   numInput: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderWidth: 2,
-    borderColor: colors.border,
+    backgroundColor: '#F8F8F8',
+    borderWidth: 1.5,
+    borderColor: '#EBEBEB',
     borderRadius: 12,
-    color: colors.gold,
+    color: colors.goldDark,
     fontSize: 26,
     fontWeight: '800',
     textAlign: 'center',
@@ -243,21 +243,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#EBEBEB',
   },
-  presetActive:     { backgroundColor: colors.goldGlow, borderColor: colors.borderGold },
+  presetActive:     { backgroundColor: colors.goldBg, borderColor: colors.borderGold },
   presetText:       { color: colors.textSecondary, fontSize: 12, fontWeight: '600' },
-  presetTextActive: { color: colors.gold, fontWeight: '700' },
+  presetTextActive: { color: colors.goldDark, fontWeight: '700' },
   actions: { flexDirection: 'row', gap: 12 },
   cancelBtn: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#EBEBEB',
     alignItems: 'center',
   },
   cancelText:  { color: colors.textMuted, fontSize: 15, fontWeight: '700' },
@@ -268,5 +268,83 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gold,
     alignItems: 'center',
   },
-  confirmText: { color: colors.primary, fontSize: 15, fontWeight: '800' },
+  confirmText: { color: '#1A1A1A', fontSize: 15, fontWeight: '800' },
 });
+
+// ─── Default Export: Unified DateTimePicker ───────────────────────────────────
+// Usage: <DateTimePicker mode="date"|"time" value={val} onChange={fn} label="..." />
+// - mode="date": value is a Date object (or null); onChange receives a Date object
+// - mode="time": value is a "HH:MM" string; onChange receives "HH:MM" string
+
+const DateTimePicker = ({ mode = 'date', value, onChange, label }) => {
+  const [open, setOpen] = React.useState(false);
+
+  const displayText = (() => {
+    if (mode === 'date') {
+      if (!value) return label || 'Select date';
+      const d = new Date(value);
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    }
+    return value || label || 'Select time';
+  })();
+
+  const handleDateConfirm = (dateStr) => {
+    // dateStr is "YYYY-MM-DD", convert to Date object
+    if (onChange) onChange(new Date(dateStr));
+    setOpen(false);
+  };
+
+  const handleTimeConfirm = (timeStr) => {
+    if (onChange) onChange(timeStr);
+    setOpen(false);
+  };
+
+  const dateValue = value instanceof Date
+    ? `${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,'0')}-${String(value.getDate()).padStart(2,'0')}`
+    : (typeof value === 'string' && value.includes('-') ? value : '');
+
+  return (
+    <>
+      <TouchableOpacity
+        style={pickerStyles.trigger}
+        onPress={() => setOpen(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={[pickerStyles.triggerText, !value && { color: '#AAAAAA' }]}>
+          {displayText}
+        </Text>
+        <Text style={pickerStyles.triggerIcon}>{mode === 'date' ? '📅' : '🕐'}</Text>
+      </TouchableOpacity>
+
+      {mode === 'date' ? (
+        <DatePickerModal
+          visible={open}
+          value={dateValue}
+          onConfirm={handleDateConfirm}
+          onClose={() => setOpen(false)}
+        />
+      ) : (
+        <TimePickerModal
+          visible={open}
+          value={typeof value === 'string' ? value : ''}
+          onConfirm={handleTimeConfirm}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+};
+
+const pickerStyles = StyleSheet.create({
+  trigger: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    borderWidth: 1.5, borderColor: '#E5E5E5', borderRadius: 10,
+    paddingHorizontal: 14, paddingVertical: 12,
+    backgroundColor: '#FAFAFA',
+  },
+  triggerText: { fontSize: 14, color: '#1A1A1A', fontWeight: '500' },
+  triggerIcon: { fontSize: 18 },
+});
+
+export default DateTimePicker;
+

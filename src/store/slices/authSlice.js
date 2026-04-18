@@ -118,6 +118,7 @@ const authSlice = createSlice({
     },
     setGlobalLang: (state, action) => {
       state.globalLang = action.payload;
+      AsyncStorage.setItem('customerGlobalLang', action.payload).catch(() => {});
     },
   },
   extraReducers: (builder) => {

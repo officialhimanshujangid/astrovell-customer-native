@@ -136,7 +136,7 @@ const KundaliScreen = ({ onBack }) => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
       
       {/* Header */}
       <View style={styles.header}>
@@ -218,7 +218,7 @@ const KundaliScreen = ({ onBack }) => {
           {form.latitude ? <Text style={styles.coordsText}>Lat: {form.latitude.slice(0,6)}, Lon: {form.longitude.slice(0,6)}</Text> : null}
 
           <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={loading}>
-            {loading ? <ActivityIndicator color={colors.primary} /> : <Text style={styles.submitBtnText}>Generate Kundali</Text>}
+            {loading ? <ActivityIndicator color="#1A1A1A" /> : <Text style={styles.submitBtnText}>Generate Kundali</Text>}
           </TouchableOpacity>
         </View>
 
@@ -396,31 +396,31 @@ const KundaliScreen = ({ onBack }) => {
 export default KundaliScreen;
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.primary },
+  root: { flex: 1, backgroundColor: '#F7F7F7' },
   header: {
-    paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16,
-    backgroundColor: colors.secondary, flexDirection: 'row', alignItems: 'center',
-    borderBottomWidth: 1, borderBottomColor: colors.border, overflow: 'hidden', gap: 12
+    paddingHorizontal: 16, paddingTop: 48, paddingBottom: 12,
+    backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center',
+    borderBottomWidth: 1, borderBottomColor: '#F0F0F0', gap: 12,
   },
   headerOrb:  { position: 'absolute', right: -50, top: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: colors.gold, opacity: 0.05 },
-  backBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
+  backBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },
   backArrow:  { color: colors.text, fontSize: 18, fontWeight: '700' },
   headerTitle:{ flex: 1, color: colors.text, fontSize: 18, fontWeight: '800' },
 
   scroll: { padding: 16 },
-  card: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: colors.border, marginBottom: 20 },
+  card: { backgroundColor: colors.primary, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: '#EFEFEF', marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   cardDesc: { color: colors.textMuted, fontSize: 13, marginBottom: 20 },
   
   label: { color: colors.textSecondary, fontSize: 12, fontWeight: '600', marginBottom: 8, marginTop: 12 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10,
-    borderWidth: 1, borderColor: colors.border,
+    backgroundColor: '#F8F8F8', borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#EBEBEB',
     color: colors.text, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14
   },
   pickerBtn: {
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10,
-    borderWidth: 1, borderColor: colors.border,
-    paddingHorizontal: 14, paddingVertical: 14, 
+    backgroundColor: '#F8F8F8', borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#EBEBEB',
+    paddingHorizontal: 14, paddingVertical: 14,
   },
   pickerText: { color: colors.text, fontSize: 14 },
   
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   genderBtn: { flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
   genderBtnActive: { backgroundColor: colors.gold, borderColor: colors.gold },
   genderText: { color: colors.textMuted, fontSize: 13, fontWeight: '600' },
-  genderTextActive: { color: colors.primary, fontWeight: '800' },
+  genderTextActive: { color: '#1A1A1A', fontWeight: '800' },
 
   placeContainer: { justifyContent: 'center' },
   placeStatus: { position: 'absolute', right: 14 },
@@ -439,30 +439,30 @@ const styles = StyleSheet.create({
   coordsText: { color: colors.success, fontSize: 11, marginTop: 6 },
 
   submitBtn: { backgroundColor: colors.gold, borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
-  submitBtnText: { color: colors.primary, fontSize: 15, fontWeight: '800' },
+  submitBtnText: { color: '#1A1A1A', fontSize: 15, fontWeight: '800' },
 
-  resultCard: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: colors.borderGold },
-  resultTitle: { color: colors.gold, fontSize: 18, fontWeight: '800', marginBottom: 12 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(245,200,66,0.1)', padding: 12, borderRadius: 10, marginBottom: 16 },
+  resultCard: { backgroundColor: colors.primary, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: colors.borderGold, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
+  resultTitle: { color: colors.goldDark, fontSize: 18, fontWeight: '800', marginBottom: 12 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.goldBg, padding: 12, borderRadius: 10, marginBottom: 16 },
   infoText: { color: colors.textSecondary, fontSize: 11, fontWeight: '600' },
 
-  tabBar: { borderBottomWidth: 1, borderBottomColor: colors.border, marginBottom: 16, paddingBottom: 10 },
-  tabActive: { color: colors.gold, fontWeight: '800', fontSize: 14 },
+  tabBar: { borderBottomWidth: 1, borderBottomColor: '#EFEFEF', marginBottom: 16, paddingBottom: 10 },
+  tabActive: { color: colors.goldDark, fontWeight: '800', fontSize: 14 },
 
-  tableHeader: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', paddingVertical: 10, borderRadius: 8, paddingHorizontal: 10, marginBottom: 8 },
+  tableHeader: { flexDirection: 'row', backgroundColor: '#F5F5F5', paddingVertical: 10, borderRadius: 8, paddingHorizontal: 10, marginBottom: 8 },
   th: { color: colors.textMuted, fontSize: 11, fontWeight: '700' },
-  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', paddingVertical: 12, paddingHorizontal: 10 },
-  tdStr: { color: colors.gold, fontSize: 12, fontWeight: '700' },
+  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#F0F0F0', paddingVertical: 12, paddingHorizontal: 10 },
+  tdStr: { color: colors.goldDark, fontSize: 12, fontWeight: '700' },
   td: { color: colors.text, fontSize: 12 },
   
   emptyText: { color: colors.textMuted, fontSize: 13, textAlign: 'center', paddingVertical: 20 },
 
   gridContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  gridItem: { width: '47%', backgroundColor: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: colors.border },
+  gridItem: { width: '47%', backgroundColor: '#F9F9F9', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EFEFEF' },
   gridLabel: { color: colors.textMuted, fontSize: 10, textTransform: 'uppercase', marginBottom: 4 },
   gridVal: { color: colors.text, fontSize: 13, fontWeight: '600' },
 
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: 'rgba(212, 175, 55, 0.1)', borderWidth: 1, borderColor: colors.borderGold, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
-  chipText: { color: colors.gold, fontSize: 12, fontWeight: '600', textTransform: 'capitalize' }
+  chip: { backgroundColor: colors.goldBg, borderWidth: 1, borderColor: colors.borderGold, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  chipText: { color: colors.goldDark, fontSize: 12, fontWeight: '600', textTransform: 'capitalize' }
 });

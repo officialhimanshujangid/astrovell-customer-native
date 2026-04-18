@@ -10,7 +10,10 @@ import {
   StatusBar,
   Animated,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginWithOtp, clearOtp, getProfile } from '../store/slices/authSlice';
 import { colors } from '../theme/colors';
@@ -80,7 +83,7 @@ const OtpScreen = ({ navigation }) => {
   const handleSubmit = async () => {
     const otpString = getOtpString();
     if (otpString.length < 6) {
-      Alert.alert('Incomplete OTP', 'Please enter the complete 6-digit OTP');
+      Toast.show({ type: 'error', text1: 'Incomplete OTP', text2: 'Please enter the complete 6-digit OTP' });
       return;
     }
     const resultAction = await dispatch(loginWithOtp({ contactNo, otp: otpString }));
@@ -92,7 +95,7 @@ const OtpScreen = ({ navigation }) => {
         dispatch(getProfile(userId));
       }
     } else {
-      Alert.alert('Invalid OTP', resultAction.payload?.message || 'The OTP you entered is incorrect');
+      Toast.show({ type: 'error', text1: 'Invalid OTP', text2: resultAction.payload?.message || 'The OTP you entered is incorrect' });
     }
   };
 
@@ -101,15 +104,14 @@ const OtpScreen = ({ navigation }) => {
     : '';
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
 
-      {STARS.map((star, i) => (
-        <View key={i} style={[styles.star, { top: star.top, left: star.left, width: star.size, height: star.size, opacity: star.opacity }]} />
-      ))}
-
-      <View style={styles.orbTop} />
-      <View style={styles.orbBottom} />
+      {/* Yellow wave top */}
+      <View style={styles.topWave} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -182,7 +184,7 @@ const OtpScreen = ({ navigation }) => {
           >
             <View style={styles.buttonInner}>
               {loading ? (
-                <ActivityIndicator color={colors.primary} />
+                <ActivityIndicator color="#1A1A1A" />
               ) : (
                 <>
                   <Text style={styles.buttonText}>Verify & Login</Text>
@@ -212,80 +214,68 @@ const OtpScreen = ({ navigation }) => {
       </View>
 
       <Text style={styles.footerText}>✦ Secure & Encrypted ✦</Text>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
-  star: {
+  topWave: {
     position: 'absolute',
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-  },
-  orbTop: {
-    position: 'absolute',
-    top: -80,
-    right: -80,
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
     backgroundColor: colors.gold,
-    opacity: 0.1,
-  },
-  orbBottom: {
-    position: 'absolute',
-    bottom: -100,
-    left: -80,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: colors.purple,
-    opacity: 0.15,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
   header: {
     alignItems: 'center',
     marginBottom: 20,
+    zIndex: 1,
   },
   logoCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(245, 200, 66, 0.15)',
-    borderWidth: 1.5,
-    borderColor: colors.borderGold,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  logoEmoji: {
-    fontSize: 28,
-  },
+  logoEmoji: { fontSize: 28 },
   appName: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: colors.gold,
-    letterSpacing: 1.5,
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#1A1A1A',
+    letterSpacing: 0.5,
   },
   card: {
     width: '100%',
-    backgroundColor: colors.surface,
-    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: colors.purple,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 24,
-    elevation: 10,
+    borderColor: '#EFEFEF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 8,
     alignItems: 'center',
+    zIndex: 1,
   },
   shieldContainer: {
     marginBottom: 16,
@@ -294,9 +284,9 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: colors.goldBg,
     borderWidth: 2,
-    borderColor: colors.purpleLight,
+    borderColor: colors.borderGold,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -349,12 +339,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   otpBox: {
-    width: (width - 40 - 48 - 50) / 6,
-    height: 54,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    width: (width - 48 - 48 - 50) / 6,
+    height: 52,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#EBEBEB',
+    backgroundColor: '#F8F8F8',
     color: colors.text,
     fontSize: 22,
     fontWeight: '800',
@@ -362,12 +352,12 @@ const styles = StyleSheet.create({
   },
   otpBoxFilled: {
     borderColor: colors.gold,
-    backgroundColor: colors.goldGlow,
+    backgroundColor: colors.goldBg,
     shadowColor: colors.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 3,
   },
   errorBox: {
     backgroundColor: colors.errorBg,
@@ -384,14 +374,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   button: {
-    width: width - 40 - 48,
-    borderRadius: 14,
-    overflow: 'hidden',
+    width: width - 48,
+    backgroundColor: colors.gold,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
     marginBottom: 16,
+    shadowColor: colors.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
+  buttonDisabled: { opacity: 0.6 },
   buttonInner: {
     backgroundColor: colors.gold,
     paddingVertical: 17,
@@ -401,14 +396,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buttonText: {
-    color: colors.primary,
+    color: '#1A1A1A',
     fontSize: 17,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
-  buttonIcon: {
-    fontSize: 18,
-  },
+  buttonIcon: { fontSize: 18 },
   resendRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -424,7 +417,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   resendLink: {
-    color: colors.purpleLight,
+    color: colors.goldDark,
     fontSize: 13,
     fontWeight: '700',
     textDecorationLine: 'underline',

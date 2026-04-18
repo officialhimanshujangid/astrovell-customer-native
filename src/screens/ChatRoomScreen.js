@@ -514,10 +514,10 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
   return (
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={0}
     >
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <View style={styles.header}>
@@ -535,7 +535,11 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
           <Text style={styles.headerName} numberOfLines={1}>
             {activeChat?.astrologerName || activeChat?.name || 'Astrologer'}
           </Text>
-          <Text style={[styles.headerStatus, { color: statusColor }]}>{status}</Text>
+          {typing ? (
+            <Text style={[styles.headerStatus, { color: colors.success, fontStyle: 'italic' }]}>typing...</Text>
+          ) : (
+            <Text style={[styles.headerStatus, { color: statusColor }]}>{status}</Text>
+          )}
         </View>
         <View style={styles.headerRight}>
           {status === 'Accepted' && (
@@ -704,7 +708,7 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
           disabled={status !== 'Accepted' || !newMessage.trim() || sending}
         >
           {sending ? (
-            <ActivityIndicator color={colors.primary} size="small" />
+            <ActivityIndicator color="#1A1A1A" size="small" />
           ) : (
             <Text style={styles.sendIcon}>🏹</Text>
           )}
@@ -735,7 +739,7 @@ const ChatRoomScreen = ({ chatId, onBack }) => {
               disabled={ratingSubmitting}
             >
               {ratingSubmitting ? (
-                <ActivityIndicator color={colors.primary} />
+                <ActivityIndicator color="#1A1A1A" />
               ) : (
                 <Text style={styles.ratingSubmitText}>Submit Review ✨</Text>
               )}
@@ -757,19 +761,19 @@ export default ChatRoomScreen;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: colors.primary },
-  centered:    { flex: 1, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { color: colors.gold, marginTop: 16, fontSize: 15, fontWeight: '600' },
+  root:        { flex: 1, backgroundColor: '#F7F7F7' },
+  centered:    { flex: 1, backgroundColor: '#F7F7F7', alignItems: 'center', justifyContent: 'center' },
+  loadingText: { color: colors.goldDark, marginTop: 16, fontSize: 15, fontWeight: '600' },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 52 : 44,
-    paddingBottom: 14,
+    paddingBottom: 12,
     paddingHorizontal: 12,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: '#F0F0F0',
     gap: 10,
   },
   backBtn:  { padding: 6 },
@@ -777,7 +781,7 @@ const styles = StyleSheet.create({
 
   headerAvatarWrap: { position: 'relative' },
   headerAvatar:     { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: colors.gold },
-  headerStatusDot:  { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: colors.secondary },
+  headerStatusDot:  { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: colors.primary },
 
   headerInfo:   { flex: 1 },
   headerName:   { color: colors.text, fontSize: 15, fontWeight: '700' },
@@ -797,7 +801,7 @@ const styles = StyleSheet.create({
   myBubble:   { backgroundColor: colors.gold, borderBottomRightRadius: 4 },
   theirBubble:{ backgroundColor: colors.surface, borderBottomLeftRadius: 4, borderWidth: 1, borderColor: colors.border },
   bubbleText: { fontSize: 15, lineHeight: 20 },
-  myText:     { color: colors.primary, fontWeight: '500' },
+  myText:     { color: '#FFFFFF', fontWeight: '500' },
   theirText:  { color: colors.text },
   bubbleFooter:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 4, gap: 3 },
   bubbleTime: { fontSize: 10 },
@@ -835,7 +839,7 @@ const styles = StyleSheet.create({
   pujaCardActions: { flexDirection: 'row', gap: 10 },
   pujaActionBtn:   { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   pujaAcceptBtn:   { backgroundColor: colors.gold },
-  pujaAcceptBtnText: { color: colors.primary, fontWeight: '800', fontSize: 13 },
+  pujaAcceptBtnText: { color: '#1A1A1A', fontWeight: '800', fontSize: 13 },
   pujaDeclineBtn:  { backgroundColor: 'rgba(239,68,68,0.1)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.4)' },
   pujaDeclineBtnText: { color: '#ef4444', fontWeight: '700', fontSize: 13 },
 
@@ -886,7 +890,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ratingSubmitBtn:  { backgroundColor: colors.gold, borderRadius: 14, paddingVertical: 14, width: '100%', alignItems: 'center', marginBottom: 10 },
-  ratingSubmitText: { color: colors.primary, fontSize: 15, fontWeight: '800' },
+  ratingSubmitText: { color: '#1A1A1A', fontSize: 15, fontWeight: '800' },
   ratingSkipBtn:    { paddingVertical: 10 },
   ratingSkipText:   { color: colors.textMuted, fontSize: 14, fontWeight: '600' },
 });

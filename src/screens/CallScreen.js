@@ -46,7 +46,7 @@ const StarRating = ({ rating = 4.5 }) => {
 };
 
 // ─── Astrologer Card (AstroTalk list style) ──────────────────────────────────
-const AstrologerCard = ({ item, onChatPress, loadingId, onAstrologerPress }) => {
+const AstrologerCard = ({ item, onCallPress, loadingId, onAstrologerPress }) => {
   const avatarUri = imgUrl(item.profileImage);
   const isOnline = item.chatStatus === 'Online';
   const isBusy = item.chatStatus === 'Busy';
@@ -131,17 +131,13 @@ const AstrologerCard = ({ item, onChatPress, loadingId, onAstrologerPress }) => 
             styles.chatBtn,
             { borderColor: btnStyle.border, backgroundColor: btnStyle.bg },
           ]}
-          onPress={() => onChatPress(item)}
-          disabled={!!loadingId || !isOnline && !isBusy}
+          onPress={() => onCallPress ? onCallPress(item) : Alert.alert('Coming Soon', 'This feature is coming soon!')}
+          disabled={!isOnline && !isBusy}
           activeOpacity={0.8}
         >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={btnStyle.text} />
-          ) : (
-            <Text style={[styles.chatBtnText, { color: btnStyle.text }]}>
-              {isOnline ? 'Chat' : isBusy ? 'Busy' : 'Offline'}
-            </Text>
-          )}
+          <Text style={[styles.chatBtnText, { color: btnStyle.text }]}>
+            {isOnline ? 'Call' : isBusy ? 'Busy' : 'Offline'}
+          </Text>
         </TouchableOpacity>
         {waitTime && isOnline && (
           <Text style={styles.waitText}>{waitTime}</Text>
@@ -152,10 +148,10 @@ const AstrologerCard = ({ item, onChatPress, loadingId, onAstrologerPress }) => 
 };
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
-const ChatScreen = ({
-  onStartChat,
+const CallScreen = ({
+  onCallPress,
   onMenuPress,        // opens the sidebar drawer
-  onChatHistoryPress, // opens Chat History screen
+  onCallHistoryPress, // opens Call History screen
   initialSearch,      // pre-fill from home search
   onSearchConsumed,   // notify parent once initialSearch consumed
   onAstrologerPress,  // navigate to astrologer detail
@@ -172,7 +168,6 @@ const ChatScreen = ({
   const [showSearch, setShowSearch] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [loadingId, setLoadingId] = useState(null);
-  const [activeSession, setActiveSession] = useState(null);
 
   // Consume the initialSearch from parent once it's been applied
   React.useEffect(() => {
@@ -185,12 +180,6 @@ const ChatScreen = ({
   useEffect(() => {
     dispatch(fetchAstrologers());
     dispatch(fetchWalletBalance());
-    chatApi.getActiveSession()
-      .then((res) => {
-        const session = res.data?.activeChat || res.data?.recordList || null;
-        if (session?.id) setActiveSession(session);
-      })
-      .catch(() => { });
   }, []);
 
   // Dynamically calculate filters based on present astrologer skills
@@ -201,7 +190,6 @@ const ChatScreen = ({
       const parts = text.split(',');
       parts.forEach((p) => {
         const trimmed = p.trim();
-        // Capitalize first letter properly for presentation
         if (trimmed) {
           skills.add(trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase());
         }
@@ -229,74 +217,26 @@ const ChatScreen = ({
     });
   }, [astrologers, search, activeFilter]);
 
-  const onlineCount = astrologers.filter((a) => a.chatStatus === 'Online').length;
-
-  const handleChatPress = async (astro) => {
+  const handleCallPress = async (astro) => {
     if (!user) {
-      Toast.show({ type: 'info', text1: 'Login Required', text2: 'Please login to chat with astrologers' });
+      Toast.show({ type: 'info', text1: 'Login Required', text2: 'Please login to call astrologers' });
       return;
     }
     if (astro.chatStatus === 'Offline') {
       Toast.show({ type: 'info', text1: 'Offline', text2: 'Astrologer is currently offline' });
       return;
     }
-    if (loadingId) return;
-
-    setLoadingId(astro.id);
-    try {
-      const intakePayload = {
-        userId: user?.id,
-        astrologerId: astro.id,
-        name: user?.name || 'User',
-        phoneNumber: user?.contactNo || '',
-        gender: user?.gender || 'Male',
-        maritalStatus: user?.maritalStatus || 'Single',
-        birthDate: user?.birthDate || '',
-        birthTime: user?.birthTime || '',
-        birthPlace: user?.birthPlace || '',
-        topicOfConcern: 'General Consultation',
-        chat_duration: 5 * 60,
-      };
-      await dispatch(addIntakeForm(intakePayload)).unwrap();
-
-      const chatPayload = {
-        astrologerId: astro.id,
-        chatRate: parseFloat(astro.charge || 0),
-      };
-      const res = await dispatch(addChatRequest(chatPayload)).unwrap();
-
-      if (res.status === 200 && res.recordList?.id) {
-        onStartChat && onStartChat(res.recordList.id);
-      } else {
-        Toast.show({ type: 'error', text1: 'Error', text2: res.message || 'Failed to start chat' });
-      }
-    } catch (err) {
-      Toast.show({ type: 'error', text1: 'Error', text2: err?.message || 'Something went wrong' });
-    } finally {
-      setLoadingId(null);
+    
+    // Default fallback if onCallPress is not fully implemented up top:
+    if (onCallPress) {
+      onCallPress(astro);
+    } else {
+      Toast.show({ type: 'info', text1: 'Coming Soon', text2: 'This feature is coming soon!' });
     }
   };
 
   const ListHeader = () => (
     <>
-      {/* Active Session Banner */}
-      {activeSession && (
-        <TouchableOpacity
-          style={styles.resumeBanner}
-          activeOpacity={0.85}
-          onPress={() => onStartChat && onStartChat(activeSession.id)}
-        >
-          <View style={styles.resumeDot} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.resumeTitle}>Active Chat in Progress</Text>
-            <Text style={styles.resumeSub}>
-              {activeSession.astrologerName || 'Astrologer'} · {activeSession.chatStatus}
-            </Text>
-          </View>
-          <Text style={styles.resumeArrow}>Resume →</Text>
-        </TouchableOpacity>
-      )}
-
       {/* AstroTalk Cashback Recharge Banner */}
       {/* <View style={styles.cashbackBanner}>
         <View style={styles.cashbackLeft}>
@@ -398,13 +338,13 @@ const ChatScreen = ({
             <Ionicons name="search" size={20} color="#555" />
           </TouchableOpacity>
 
-          {/* Chat history icon */}
+          {/* Call history icon */}
           <TouchableOpacity
             style={styles.iconBtn}
-            onPress={() => onChatHistoryPress && onChatHistoryPress()}
+            onPress={() => onCallHistoryPress && onCallHistoryPress()}
             activeOpacity={0.8}
           >
-            <Ionicons name="chatbubble-ellipses-outline" size={20} color="#555" />
+            <Ionicons name="call-outline" size={20} color="#555" />
           </TouchableOpacity>
 
           {/* Profile / Sidebar icon */}
@@ -448,7 +388,7 @@ const ChatScreen = ({
           renderItem={({ item }) => (
             <AstrologerCard
               item={item}
-              onChatPress={handleChatPress}
+              onCallPress={handleCallPress}
               loadingId={loadingId}
               onAstrologerPress={onAstrologerPress}
             />
@@ -467,7 +407,7 @@ const ChatScreen = ({
   );
 };
 
-export default ChatScreen;
+export default CallScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F7F7F7' },

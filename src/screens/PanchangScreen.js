@@ -365,7 +365,7 @@ const PanchangScreen = () => {
   if (loading && !data) {
     return (
       <View style={styles.centerScreen}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
         <Text style={{ fontSize: 64 }}>🪐</Text>
         <ActivityIndicator size="large" color={colors.gold} style={{ marginTop: 20 }} />
         <Text style={styles.loadingText}>{l.loading}</Text>
@@ -377,7 +377,7 @@ const PanchangScreen = () => {
   if (error && !data) {
     return (
       <View style={styles.centerScreen}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.headerBg} />
         <Text style={{ fontSize: 48, marginBottom: 16 }}>⚠️</Text>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryBtn} onPress={() => load(selectedDate, lang)}>
@@ -404,7 +404,7 @@ const PanchangScreen = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
       {/* ── Header ── */}
       <View style={styles.header}>
@@ -729,10 +729,11 @@ export default PanchangScreen;
 const CELL_SIZE = Math.floor((width - 80) / 7);
 
 const cal = StyleSheet.create({
-  overlay:   { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center' },
-  sheet:     { backgroundColor: colors.secondary, borderRadius: 24, width: width - 40, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  overlay:   { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
+  sheet:     { backgroundColor: colors.primary, borderRadius: 24, width: width - 40, borderWidth: 1, borderColor: '#EFEFEF', overflow: 'hidden',
+               shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 20, elevation: 12 },
   navRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16 },
-  navBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
+  navBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#EBEBEB' },
   navArrow:  { color: colors.text, fontSize: 22, fontWeight: '300' },
   monthTitle:{ color: colors.text, fontSize: 16, fontWeight: '800' },
   dayRow:    { flexDirection: 'row', paddingHorizontal: 16, marginBottom: 6 },
@@ -740,76 +741,78 @@ const cal = StyleSheet.create({
   grid:      { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, marginBottom: 16 },
   cell:      { width: CELL_SIZE, height: CELL_SIZE, alignItems: 'center', justifyContent: 'center' },
   cellSel:   { backgroundColor: colors.gold, borderRadius: CELL_SIZE / 2 },
-  cellToday: { borderWidth: 1.5, borderColor: colors.purpleLight, borderRadius: CELL_SIZE / 2 },
-  cellText:  { color: colors.textSecondary, fontSize: 13 },
-  cellTextSel:   { color: colors.primary, fontWeight: '800' },
-  cellTextToday: { color: colors.purpleLight, fontWeight: '700' },
+  cellToday: { borderWidth: 1.5, borderColor: colors.gold, borderRadius: CELL_SIZE / 2, backgroundColor: colors.goldBg },
+  cellText:  { color: colors.text, fontSize: 13 },
+  cellTextSel:   { color: '#1A1A1A', fontWeight: '800' },
+  cellTextToday: { color: colors.goldDark, fontWeight: '700' },
   actions:   { flexDirection: 'row', gap: 12, padding: 16 },
-  cancelBtn: { flex: 1, paddingVertical: 13, borderRadius: 12, borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
+  cancelBtn: { flex: 1, paddingVertical: 13, borderRadius: 12, borderWidth: 1, borderColor: '#EBEBEB', backgroundColor: '#F5F5F5', alignItems: 'center' },
   cancelText:{ color: colors.textSecondary, fontSize: 14, fontWeight: '600' },
   confirmBtn:{ flex: 1, paddingVertical: 13, borderRadius: 12, backgroundColor: colors.gold, alignItems: 'center' },
-  confirmText:{ color: colors.primary, fontSize: 14, fontWeight: '800' },
+  confirmText:{ color: '#1A1A1A', fontSize: 14, fontWeight: '800' },
 });
 
 // ── Screen Styles ─────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.primary },
+  root: { flex: 1, backgroundColor: '#F7F7F7' },
 
   centerScreen: {
-    flex: 1, backgroundColor: colors.primary,
+    flex: 1, backgroundColor: '#F7F7F7',
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32,
   },
   loadingText: { color: colors.textSecondary, fontSize: 14, marginTop: 14, textAlign: 'center' },
   errorText:   { color: colors.error, fontSize: 15, textAlign: 'center', marginBottom: 20 },
   retryBtn:    { backgroundColor: colors.gold, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12 },
-  retryText:   { color: colors.primary, fontSize: 14, fontWeight: '800' },
+  retryText:   { color: '#1A1A1A', fontSize: 14, fontWeight: '800' },
 
   // ── Header ──────────────────────────────────────────────────────────────
   header: {
-    paddingHorizontal: 20, paddingTop: 52, paddingBottom: 14,
-    backgroundColor: colors.secondary,
+    paddingHorizontal: 16, paddingTop: 48, paddingBottom: 14,
+    backgroundColor: colors.primary,
     flexDirection: 'row', alignItems: 'center',
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    borderBottomWidth: 1, borderBottomColor: '#F0F0F0',
     overflow: 'hidden',
   },
   headerOrb:  { position: 'absolute', right: -50, top: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: colors.gold, opacity: 0.07 },
-  headerDay:  { color: colors.gold, fontSize: 13, fontWeight: '700', letterSpacing: 0.4 },
+  headerDay:  { color: colors.goldDark, fontSize: 13, fontWeight: '700', letterSpacing: 0.4 },
   headerDate: { color: colors.text, fontSize: 17, fontWeight: '800', marginTop: 3 },
 
   // Lang toggle
-  langToggle:  { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: colors.border, gap: 6 },
-  langActive:  { color: colors.gold, fontSize: 12, fontWeight: '800' },
-  langSep:     { color: colors.border, fontSize: 12 },
+  langToggle:  { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: '#EBEBEB', gap: 6 },
+  langActive:  { color: colors.goldDark, fontSize: 12, fontWeight: '800' },
+  langSep:     { color: '#DDD', fontSize: 12 },
   langInactive:{ color: colors.textMuted, fontSize: 12, fontWeight: '600' },
 
   // ── Date Navigator ───────────────────────────────────────────────────────
   dateNav: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    borderBottomWidth: 1, borderBottomColor: '#F0F0F0',
     gap: 8,
   },
-  dateNavArrow:         { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
+  dateNavArrow:         { width: 38, height: 38, borderRadius: 19, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#EBEBEB' },
   dateNavArrowDisabled: { opacity: 0.3 },
   dateNavArrowText:     { color: colors.text, fontSize: 22, fontWeight: '300' },
   dateNavCenter: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(245,200,66,0.1)', borderRadius: 20,
+    backgroundColor: colors.goldBg, borderRadius: 20,
     paddingVertical: 8, paddingHorizontal: 16, gap: 8,
     borderWidth: 1, borderColor: colors.borderGold,
   },
   dateNavIcon:  { fontSize: 16 },
-  dateNavLabel: { color: colors.gold, fontSize: 14, fontWeight: '700' },
-  dateNavCaret: { color: colors.gold, fontSize: 11 },
+  dateNavLabel: { color: colors.goldDark, fontSize: 14, fontWeight: '700' },
+  dateNavCaret: { color: colors.goldDark, fontSize: 11 },
 
   // Loading overlay
   loadingOverlay: {
     position: 'absolute', top: 160, alignSelf: 'center',
-    backgroundColor: 'rgba(15,10,30,0.85)', borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 20,
     paddingHorizontal: 18, paddingVertical: 10,
     zIndex: 99,
+    borderWidth: 1, borderColor: '#EFEFEF',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 4,
   },
 
   scroll: { paddingHorizontal: 16, paddingTop: 16 },
@@ -820,12 +823,12 @@ const styles = StyleSheet.create({
   },
 
   // ── Muhurta Banner ───────────────────────────────────────────────────────
-  muhurtaBanner:  { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.borderGold, flexDirection: 'row', alignItems: 'center', marginBottom: 20, overflow: 'hidden' },
+  muhurtaBanner:  { backgroundColor: colors.primary, borderRadius: 18, borderWidth: 1, borderColor: colors.borderGold, flexDirection: 'row', alignItems: 'center', marginBottom: 20, overflow: 'hidden' },
   muhurtaItem:    { flex: 1, alignItems: 'center', paddingVertical: 16 },
   muhurtaDivider: { width: 1, height: 40, backgroundColor: colors.borderGold },
   muhurtaEmoji:   { fontSize: 22, marginBottom: 4 },
   muhurtaLabel:   { color: colors.textMuted, fontSize: 10, fontWeight: '600', marginBottom: 3 },
-  muhurtaValue:   { color: colors.gold, fontSize: 12, fontWeight: '800' },
+  muhurtaValue:   { color: colors.goldDark, fontSize: 12, fontWeight: '800' },
 
   // ── Inauspicious ─────────────────────────────────────────────────────────
   inauspiciousRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
@@ -850,7 +853,7 @@ const styles = StyleSheet.create({
   badge:     { borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: 10, fontWeight: '700' },
 
-  timeRangeRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden', marginTop: 4 },
+  timeRangeRow: { flexDirection: 'row', backgroundColor: '#F8F8F8', borderRadius: 10, overflow: 'hidden', marginTop: 4 },
   timeBox:   { flex: 1, paddingVertical: 10, alignItems: 'center' },
   timeSep:   { width: 1, backgroundColor: colors.border, marginVertical: 8 },
   timeLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '600', marginBottom: 3 },
@@ -878,19 +881,19 @@ const styles = StyleSheet.create({
   yearsContainer: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginBottom: 14 },
   yearRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: colors.border },
   yearLabel: { color: colors.textMuted, fontSize: 12, fontWeight: '600' },
-  yearValue: { color: colors.purpleLight, fontSize: 12, fontWeight: '700' },
+  yearValue: { color: colors.goldDark, fontSize: 12, fontWeight: '700' },
 
-  advancedBtn:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(124,58,237,0.18)', borderRadius: 16, paddingHorizontal: 20, paddingVertical: 16, borderWidth: 1, borderColor: colors.border, marginBottom: 8 },
-  advancedBtnText:  { color: colors.purpleLight, fontSize: 14, fontWeight: '700' },
-  advancedBtnChevron:{ color: colors.purpleLight, fontSize: 22 },
+  advancedBtn:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.goldBg, borderRadius: 16, paddingHorizontal: 20, paddingVertical: 16, borderWidth: 1, borderColor: colors.borderGold, marginBottom: 8 },
+  advancedBtnText:  { color: colors.goldDark, fontSize: 14, fontWeight: '700' },
+  advancedBtnChevron:{ color: colors.goldDark, fontSize: 22 },
 
   // ── Detail Modals ─────────────────────────────────────────────────────────
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'flex-end' },
-  modalSheet:   { backgroundColor: colors.secondary, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '85%', borderWidth: 1, borderColor: colors.border },
+  modalSheet:   { backgroundColor: colors.primary, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '85%', borderWidth: 1, borderColor: '#EFEFEF' },
   modalHeader:  { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingVertical: 16, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   modalEmoji:   { fontSize: 24 },
   modalTitle:   { flex: 1, fontSize: 18, fontWeight: '800' },
-  modalClose:   { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  modalClose:   { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },
   modalCloseText:{ color: colors.textSecondary, fontSize: 14, fontWeight: '700' },
   modalContent:  { paddingHorizontal: 20, paddingTop: 16 },
   modalInfoRow:  { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12 },
@@ -898,7 +901,7 @@ const styles = StyleSheet.create({
   modalInfoRight:{ flex: 1 },
   modalInfoLabel:{ color: colors.textMuted, fontSize: 11, fontWeight: '600', marginBottom: 3 },
   modalInfoValue:{ color: colors.text, fontSize: 14, fontWeight: '700' },
-  modalTextBlock:{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 14, marginTop: 12 },
-  modalBlockTitle:{ color: colors.gold, fontSize: 12, fontWeight: '700', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.8 },
+  modalTextBlock:{ backgroundColor: colors.goldBg, borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1, borderColor: colors.borderGold },
+  modalBlockTitle:{ color: colors.goldDark, fontSize: 12, fontWeight: '700', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.8 },
   modalBlockText: { color: colors.textSecondary, fontSize: 13, lineHeight: 20 },
 });

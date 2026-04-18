@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,229 +6,311 @@ import {
   ScrollView,
   StyleSheet,
   StatusBar,
-  Image,
-  ActivityIndicator,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchAstromallProducts,
-  fetchPujaCategories,
-  fetchBlogs,
-  imgUrl,
-} from '../store/slices/homeSlice';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Feather from '@expo/vector-icons/Feather';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { colors } from '../theme/colors';
 import usePermissions from '../hooks/usePermissions';
 
 const { width } = Dimensions.get('window');
-const CARD_W = (width - 40 - 12) / 2 - 6;
+
+// ─── Menu Row Definitions ────────────────────────────────────────────────────
+// action types:
+//   tab         → navigate to a tab (goToTab)
+//   wallet      → open wallet screen
+//   kundali     → open kundali screen
+//   matching    → open kundali matching screen
+//   horoscope   → open horoscope screen
+//   blogs       → open blogs list
+//   profile     → open profile screen
+//   profileEdit → open profile edit screen
+//   dummy       → open ComingSoon with a title
+//   url         → open external URL
 
 const ALL_MENU_ROWS = [
-  { icon: '🔮', label: 'Talk to Astrologer', sub: 'Live chat & call', tab: 'Chat', permKey: 'menu_talk_to_astrologer', featureKey: 'chat' },
-  { icon: '📜', label: 'Kundali Matching', sub: 'Compatibility report', action: 'KundaliMatching', permKey: 'menu_kundali_matching', featureKey: 'kundali_matching' },
-  { icon: '📅', label: "Today's Panchang", sub: 'Muhurat & tithi', tab: 'Panchang', permKey: 'menu_panchang', featureKey: 'panchang' },
-  { icon: '♋', label: 'Daily Horoscope', sub: 'Read your zodiac', action: 'Horoscope', permKey: 'menu_horoscope', featureKey: 'horoscope' },
-  { icon: '💎', label: 'Gemstone Advisor', sub: 'Find your lucky stone', permKey: 'menu_gemstone_advisor', featureKey: 'gemstone_advisor' },
-  { icon: '🧿', label: 'Vastu Tips', sub: 'Harmony at home', permKey: 'menu_vastu_tips', featureKey: 'vastu_tips' },
-  { icon: '🌐', label: 'Free Kundali', sub: 'Generate birth chart', action: 'FreeKundali', permKey: 'menu_free_kundali', featureKey: 'free_kundali' },
-  { icon: '🎁', label: 'Refer & Earn', sub: 'Invite friends', permKey: 'menu_refer_and_earn', featureKey: 'refer_and_earn' },
-  { icon: '🛎️', label: 'Help & Support', sub: 'FAQs & contact us', permKey: 'menu_help_support', featureKey: 'help_support' },
+  {
+    label: 'Home',
+    action: 'tab',
+    tab: 'Home',
+    permKey: 'tab_home',
+    Icon: ({ c }) => <Ionicons name="home-outline" size={22} color={c} />,
+  },
+  {
+    label: 'My Profile',
+    action: 'profile',
+    permKey: 'profile',
+    Icon: ({ c }) => <Ionicons name="person-circle-outline" size={22} color={c} />,
+  },
+  {
+    label: 'My Kundli',
+    action: 'kundali',
+    permKey: 'free_kundali',
+    Icon: ({ c }) => <MaterialCommunityIcons name="shape-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Kundli Matching',
+    action: 'matching',
+    permKey: 'kundali_matching',
+    Icon: ({ c }) => <MaterialCommunityIcons name="ring" size={22} color={c} />,
+  },
+  {
+    label: 'Daily Horoscope',
+    action: 'horoscope',
+    permKey: 'horoscope',
+    Icon: ({ c }) => <MaterialCommunityIcons name="white-balance-sunny" size={22} color={c} />,
+  },
+  {
+    label: 'Chat with Astrologers',
+    action: 'tab',
+    tab: 'Chat',
+    permKey: 'chat',
+    Icon: ({ c }) => <MaterialCommunityIcons name="account-star-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Astrology Blog',
+    action: 'blogs',
+    permKey: 'blogs',
+    Icon: ({ c }) => <MaterialCommunityIcons name="newspaper-variant-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Wallet Transactions',
+    action: 'wallet',
+    permKey: 'wallet',
+    Icon: ({ c }) => <MaterialCommunityIcons name="wallet-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Book a Pooja',
+    action: 'puja',
+    badge: 'NEW',
+    permKey: 'puja',
+    Icon: ({ c }) => <MaterialCommunityIcons name="pot-steam-outline" size={22} color={c} />,
+  },
+  {
+    label: 'AstroShop',
+    action: 'astroShop',
+    permKey: 'astromall',
+    Icon: ({ c }) => <MaterialCommunityIcons name="shopping-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Order History',
+    action: 'orderHistory',
+    permKey: 'order_history',
+    Icon: ({ c }) => <MaterialCommunityIcons name="history" size={22} color={c} />,
+  },
+  {
+    label: 'My Following',
+    action: 'following',
+    permKey: 'my_following',
+    Icon: ({ c }) => <Ionicons name="people-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Redeem Gift Card',
+    action: 'dummy',
+    dummyTitle: 'Redeem Gift Card',
+    permKey: 'redeem_gift_card',
+    Icon: ({ c }) => <MaterialCommunityIcons name="gift-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Refer & Earn',
+    action: 'referEarn',
+    permKey: 'refer_and_earn',
+    Icon: ({ c }) => <MaterialCommunityIcons name="account-plus-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Free Services',
+    action: 'astroServices',
+    permKey: 'free_services',
+    Icon: ({ c }) => <MaterialCommunityIcons name="tag-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Customer Support',
+    action: 'dummy',
+    dummyTitle: 'Customer Support Chat',
+    permKey: 'help_support',
+    Icon: ({ c }) => <Ionicons name="headset-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Vastu Tips',
+    action: 'dummy',
+    dummyTitle: 'Vastu Tips',
+    permKey: 'vastu_tips',
+    Icon: ({ c }) => <MaterialCommunityIcons name="home-city-outline" size={22} color={c} />,
+  },
+  {
+    label: 'Gemstone Advisor',
+    action: 'dummy',
+    dummyTitle: 'Gemstone Advisor',
+    permKey: 'gemstone_advisor',
+    Icon: ({ c }) => <MaterialCommunityIcons name="diamond-stone" size={22} color={c} />,
+  },
+  {
+    label: 'Settings',
+    action: 'dummy',
+    dummyTitle: 'Settings',
+    permKey: 'settings',
+    Icon: ({ c }) => <Ionicons name="settings-outline" size={22} color={c} />,
+  },
 ];
 
-const stripHtml = (html = '') => html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+const SOCIAL_LINKS = [
+  { name: 'apple',     url: 'https://apple.com',     Icon: (c) => <Ionicons name="logo-apple" size={18} color={c} /> },
+  { name: 'globe',     url: 'https://astrotalk.com', Icon: (c) => <MaterialCommunityIcons name="earth" size={18} color={c} /> },
+  { name: 'youtube',   url: 'https://youtube.com',   Icon: (c) => <AntDesign name="youtube" size={18} color={c} /> },
+  { name: 'facebook',  url: 'https://facebook.com',  Icon: (c) => <FontAwesome name="facebook" size={18} color={c} /> },
+  { name: 'instagram', url: 'https://instagram.com', Icon: (c) => <AntDesign name="instagram" size={18} color={c} /> },
+  { name: 'linkedin',  url: 'https://linkedin.com',  Icon: (c) => <FontAwesome name="linkedin" size={18} color={c} /> },
+];
+const SOCIAL_COLORS = ['#000', '#4CAF50', '#FF0000', '#1877F2', '#E1306C', '#0A66C2'];
 
-const fmtDate = (iso) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-};
-
-const MenuScreen = ({ onBlogPress, onTabPress, onHoroscopePress, onKundaliPress, onMatchingPress, onWalletPress }) => {
-  const dispatch = useDispatch();
-  const {
-    astromallProducts, astromallLoad,
-    pujaCategories, pujaLoad,
-    blogs, blogsLoad,
-  } = useSelector((s) => s.home);
-  const { walletBalance, settings } = useSelector((s) => s.auth);
+// ─── Main Component ──────────────────────────────────────────────────────────
+const MenuScreen = ({
+  onClose,
+  onTabPress,
+  onHoroscopePress,
+  onKundaliPress,
+  onMatchingPress,
+  onWalletPress,                  // open recharge tab
+  onWalletTransactionsPress,      // open history/transactions tab
+  onBlogsPress,
+  onProfilePress,
+  onProfileEditPress,
+  onOrderHistoryPress,
+  onFollowingPress,
+  onPujaPress,
+  onReferEarnPress,
+  onAstroServicesPress,
+  onAstroShopPress,
+  onDummyPress,
+}) => {
+  const { user } = useSelector((s) => s.auth);
   const { can } = usePermissions();
 
-  useEffect(() => {
-    dispatch(fetchAstromallProducts());
-    dispatch(fetchPujaCategories());
-    dispatch(fetchBlogs());
-  }, []);
+  const MENU_ROWS = ALL_MENU_ROWS.filter(
+    (item) => can(item.permKey)
+  );
 
-  const MENU_ROWS = ALL_MENU_ROWS.filter(item => can(item.permKey) && (!item.featureKey || can(item.featureKey)));
+  const handlePress = (item) => {
+    switch (item.action) {
+      case 'tab':          if (onTabPress)           onTabPress(item.tab); break;
+      // "Wallet Transactions" menu item → always open history tab
+      case 'wallet':       if (onWalletTransactionsPress) onWalletTransactionsPress();
+                           else if (onWalletPress)        onWalletPress();
+                           break;
+      case 'horoscope':    if (onHoroscopePress)     onHoroscopePress(); break;
+      case 'kundali':      if (onKundaliPress)       onKundaliPress(); break;
+      case 'matching':     if (onMatchingPress)      onMatchingPress(); break;
+      case 'blogs':        if (onBlogsPress)         onBlogsPress(); break;
+      case 'profile':      if (onProfilePress)       onProfilePress(); break;
+      case 'profileEdit':  if (onProfileEditPress)   onProfileEditPress(); break;
+      case 'orderHistory': if (onOrderHistoryPress)  onOrderHistoryPress(); break;
+      case 'following':    if (onFollowingPress)     onFollowingPress(); break;
+      case 'puja':         if (onPujaPress)          onPujaPress(); break;
+      case 'referEarn':    if (onReferEarnPress)     onReferEarnPress(); break;
+      case 'astroServices':if (onAstroServicesPress) onAstroServicesPress(); break;
+      case 'astroShop':   if (onAstroShopPress)     onAstroShopPress(); break;
+      case 'dummy':        if (onDummyPress)         onDummyPress(item.dummyTitle || item.label); break;
+      default: if (onClose) onClose();
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.headerTitle}>Explore</Text>
-          <Text style={styles.headerSub}>All services at your fingertips</Text>
-        </View>
-        {can('menu_wallet_button') && can('wallet') && (
-          <TouchableOpacity style={styles.walletBtn} activeOpacity={0.8} onPress={onWalletPress}>
-            <Text style={styles.walletEmoji}>💰</Text>
-            <Text style={styles.walletBalance}>
-              {settings?.currencySymbol || '₹'}{walletBalance.toLocaleString('en-IN')}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
-        {/* Promo Banner */}
-        {can('menu_promo_banner') && (
-          <View style={styles.banner}>
-            <View style={styles.bannerLeft}>
-              <Text style={styles.bannerTag}>✨ NEW USER OFFER</Text>
-              <Text style={styles.bannerTitle}>First Chat FREE</Text>
-              <Text style={styles.bannerSub}>Talk at ₹0 for 5 minutes</Text>
-              <TouchableOpacity style={styles.bannerBtn} activeOpacity={0.85}>
-                <Text style={styles.bannerBtnText}>Claim Now →</Text>
-              </TouchableOpacity>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+        {/* ── Profile Header ── */}
+        <View style={styles.profileSection}>
+          <View style={styles.profileLeft}>
+            <View style={styles.avatarCircle}>
+              <MaterialCommunityIcons name="zodiac-gemini" size={28} color="#1A1A1A" />
             </View>
-            <Text style={styles.bannerEmoji}>🌟</Text>
+            <View style={styles.profileInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.userName}>{user?.name || 'User'}</Text>
+                {can('profile_edit') && (
+                  <TouchableOpacity
+                    style={styles.editNameBtn}
+                    onPress={() => {
+                      if (onProfileEditPress) onProfileEditPress();
+                      if (onClose) onClose();
+                    }}
+                  >
+                    <Feather name="edit-2" size={14} color={colors.textMuted} />
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text style={styles.userPhone}>
+                {user?.contactNo ? `+91-${user.contactNo}` : '––––––––––'}
+              </Text>
+            </View>
           </View>
-        )}
+          {onClose && (
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+              <Ionicons name="close" size={22} color={colors.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
 
-        {/* Services Grid */}
-        <Text style={styles.sectionTitle}>Our Services</Text>
-        <View style={styles.grid}>
+        {/* ── Divider ── */}
+        <View style={styles.divider} />
+
+        {/* ── Menu Items ── */}
+        <View style={styles.menuList}>
           {MENU_ROWS.map((item, i) => (
             <TouchableOpacity
               key={i}
-              style={styles.menuCard}
-              activeOpacity={0.8}
-              onPress={() => {
-                if (item.tab && onTabPress) onTabPress(item.tab);
-                else if (item.action === 'Horoscope' && onHoroscopePress) onHoroscopePress();
-                else if (item.action === 'FreeKundali' && onKundaliPress) onKundaliPress();
-                else if (item.action === 'KundaliMatching' && onMatchingPress) onMatchingPress();
-              }}
+              style={styles.menuRow}
+              onPress={() => handlePress(item)}
+              activeOpacity={0.7}
             >
-              <View style={styles.menuIconBg}>
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+              <View style={styles.menuIconWrap}>
+                {item.Icon && <item.Icon c={colors.textSecondary} />}
               </View>
               <Text style={styles.menuLabel}>{item.label}</Text>
-              <Text style={styles.menuSub}>{item.sub}</Text>
+              {item.badge ? (
+                <View style={styles.newBadge}>
+                  <Text style={styles.newBadgeText}>{item.badge}</Text>
+                </View>
+              ) : (
+                <Ionicons name="chevron-forward" size={16} color="#CCCCCC" />
+              )}
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Puja Categories */}
-        {can('puja') && (
-          <>
-            <Text style={styles.sectionTitle}>Book a Puja</Text>
-            {pujaLoad ? (
-              <ActivityIndicator color={colors.gold} style={{ marginBottom: 16 }} />
-            ) : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
-                style={{ marginBottom: 24 }}
+        {/* ── Divider ── */}
+        <View style={styles.divider} />
+
+        {/* ── Also Available On ── */}
+        <View style={styles.socialSection}>
+          <Text style={styles.socialTitle}>Also available on</Text>
+          <View style={styles.socialRow}>
+            {SOCIAL_LINKS.map((s, i) => (
+              <TouchableOpacity
+                key={s.name}
+                style={[styles.socialBtn, { backgroundColor: SOCIAL_COLORS[i] }]}
+                onPress={() => Linking.openURL(s.url)}
+                activeOpacity={0.8}
               >
-                {pujaCategories.map((p) => (
-                  <TouchableOpacity key={p.id} style={styles.pujaCard} activeOpacity={0.85}>
-                    {p.image ? (
-                      <Image source={{ uri: imgUrl(p.image) }} style={styles.pujaImg} resizeMode="cover" />
-                    ) : (
-                      <View style={[styles.pujaImg, styles.pujaFallback]}>
-                        <Text style={{ fontSize: 30 }}>🪔</Text>
-                      </View>
-                    )}
-                    <Text style={styles.pujaName} numberOfLines={2}>{p.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            )}
-          </>
-        )}
+                {s.Icon('#FFF')}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-        {/* Astromall */}
-        {can('menu_astromall') && can('astromall') && (
-          <>
-            <Text style={styles.sectionTitle}>Astromall</Text>
-            {astromallLoad ? (
-              <ActivityIndicator color={colors.gold} style={{ marginBottom: 16 }} />
-            ) : (
-              <View style={styles.productGrid}>
-                {astromallProducts.map((prod) => (
-                  <TouchableOpacity key={prod.id} style={styles.productCard} activeOpacity={0.85}>
-                    {prod.productImage ? (
-                      <Image source={{ uri: imgUrl(prod.productImage) }} style={styles.productImg} resizeMode="cover" />
-                    ) : (
-                      <View style={[styles.productImg, styles.productFallback]}>
-                        <Text style={{ fontSize: 32 }}>💎</Text>
-                      </View>
-                    )}
-                    <View style={styles.productInfo}>
-                      <Text style={styles.productName} numberOfLines={2}>{prod.name}</Text>
-                      <Text style={styles.productFeature} numberOfLines={2}>{prod.features}</Text>
-                      <View style={styles.productFooter}>
-                        <Text style={styles.productPrice}>₹{prod.amount}</Text>
-                        <TouchableOpacity style={styles.addCartBtn}>
-                          <Text style={styles.addCartText}>+ Cart</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </>
-        )}
+        {/* ── Version ── */}
+        <View style={styles.versionRow}>
+          <Text style={styles.versionText}>Version 1.1.474</Text>
+        </View>
 
-        {/* Blogs */}
-        {can('menu_blogs') && can('blogs') && (
-          <>
-            <Text style={[styles.sectionTitle, { marginTop: 8 }]}>Astrology Blog</Text>
-            {blogsLoad ? (
-              <ActivityIndicator color={colors.gold} style={{ marginBottom: 16 }} />
-            ) : (
-              <View style={styles.blogList}>
-                {blogs.map((blog) => {
-                  const imageUri = imgUrl(blog.blogImage || blog.previewImage);
-                  return (
-                    <TouchableOpacity key={blog.id} style={styles.blogCard} onPress={() => onBlogPress && onBlogPress(blog)} activeOpacity={0.85}>
-                      {/* Image */}
-                      {imageUri ? (
-                        <Image source={{ uri: imageUri }} style={styles.blogImg} resizeMode="cover" />
-                      ) : (
-                        <View style={[styles.blogImg, styles.blogFallback]}>
-                          <Text style={{ fontSize: 28 }}>📖</Text>
-                        </View>
-                      )}
-                      {/* Info */}
-                      <View style={styles.blogBody}>
-                        <Text style={styles.blogDate}>{fmtDate(blog.postedOn)}</Text>
-                        <Text style={styles.blogTitle} numberOfLines={2}>{blog.title}</Text>
-                        <Text style={styles.blogDesc} numberOfLines={2}>
-                          {stripHtml(blog.description)}
-                        </Text>
-                        <View style={styles.blogMeta}>
-                          <Text style={styles.blogAuthor}>✍️ {blog.author || 'Astrovell'}</Text>
-                          {blog.viewer ? (
-                            <Text style={styles.blogViewer}>👁 {blog.viewer}</Text>
-                          ) : null}
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </>
-        )}
-
-        <View style={{ height: 20 }} />
+        <View style={{ height: 32 }} />
       </ScrollView>
     </View>
   );
@@ -237,77 +319,112 @@ const MenuScreen = ({ onBlogPress, onTabPress, onHoroscopePress, onKundaliPress,
 export default MenuScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
 
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 52,
-    paddingBottom: 16,
-    backgroundColor: colors.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+  // Profile section
+  profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 52,
+    paddingBottom: 20,
   },
-  headerLeft: { flex: 1 },
-  headerTitle: { color: colors.text, fontSize: 22, fontWeight: '800' },
-  headerSub: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
-  walletBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: colors.border },
-  walletEmoji: { fontSize: 13, marginRight: 6 },
-  walletBalance: { color: colors.gold, fontSize: 14, fontWeight: '800' },
+  profileLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  avatarCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.gold,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  profileInfo: { flex: 1 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
+  userName: { fontSize: 17, fontWeight: '800', color: colors.text },
+  editNameBtn: { padding: 2 },
+  userPhone: { fontSize: 13, color: colors.textMuted },
+  closeBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 18,
+    backgroundColor: '#F5F5F5',
+  },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 20 },
+  divider: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginHorizontal: 0,
+  },
 
-  // Promo banner
-  banner: { backgroundColor: 'rgba(124,58,237,0.22)', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', marginBottom: 24 },
-  bannerLeft: { flex: 1 },
-  bannerTag: { color: colors.purpleLight, fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginBottom: 4 },
-  bannerTitle: { color: colors.text, fontSize: 20, fontWeight: '800', marginBottom: 4 },
-  bannerSub: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginBottom: 14 },
-  bannerBtn: { alignSelf: 'flex-start', backgroundColor: colors.gold, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10 },
-  bannerBtnText: { color: colors.primary, fontSize: 13, fontWeight: '800' },
-  bannerEmoji: { fontSize: 56 },
+  // Menu rows
+  menuList: { paddingVertical: 8 },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    gap: 16,
+  },
+  menuIconWrap: { width: 24, alignItems: 'center' },
+  menuLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text,
+  },
+  newBadge: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  newBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '800' },
 
-  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '700', marginBottom: 14 },
+  // Social
+  socialSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  socialTitle: {
+    fontSize: 12,
+    color: colors.textMuted,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  socialBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-  // Services grid
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 28 },
-  menuCard: { width: CARD_W, backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border },
-  menuIconBg: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(124,58,237,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  menuIcon: { fontSize: 22 },
-  menuLabel: { color: colors.text, fontSize: 13, fontWeight: '700', marginBottom: 3 },
-  menuSub: { color: colors.textMuted, fontSize: 11, lineHeight: 15 },
-
-  // Puja
-  pujaCard: { width: 150, backgroundColor: colors.surface, borderRadius: 14, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-  pujaImg: { width: '100%', height: 90 },
-  pujaFallback: { backgroundColor: 'rgba(124,58,237,0.15)', alignItems: 'center', justifyContent: 'center' },
-  pujaName: { color: colors.text, fontSize: 12, fontWeight: '600', padding: 10, lineHeight: 16 },
-
-  // Products
-  productGrid: { gap: 12, marginBottom: 8 },
-  productCard: { backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', overflow: 'hidden' },
-  productImg: { width: 100, height: 100 },
-  productFallback: { backgroundColor: 'rgba(124,58,237,0.15)', alignItems: 'center', justifyContent: 'center' },
-  productInfo: { flex: 1, padding: 12 },
-  productName: { color: colors.text, fontSize: 13, fontWeight: '700', marginBottom: 4 },
-  productFeature: { color: colors.textSecondary, fontSize: 11, lineHeight: 16, marginBottom: 8 },
-  productFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  productPrice: { color: colors.gold, fontSize: 16, fontWeight: '800' },
-  addCartBtn: { backgroundColor: colors.gold, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 },
-  addCartText: { color: colors.primary, fontSize: 12, fontWeight: '800' },
-
-  // Blogs
-  blogList: { gap: 14, marginBottom: 8 },
-  blogCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', flexDirection: 'row' },
-  blogImg: { width: 100, height: 110 },
-  blogFallback: { backgroundColor: 'rgba(124,58,237,0.2)', alignItems: 'center', justifyContent: 'center' },
-  blogBody: { flex: 1, padding: 12 },
-  blogDate: { color: colors.textMuted, fontSize: 10, marginBottom: 4 },
-  blogTitle: { color: colors.text, fontSize: 13, fontWeight: '700', lineHeight: 18, marginBottom: 4 },
-  blogDesc: { color: colors.textSecondary, fontSize: 11, lineHeight: 16, marginBottom: 6 },
-  blogMeta: { flexDirection: 'row', gap: 12 },
-  blogAuthor: { color: colors.textMuted, fontSize: 10 },
-  blogViewer: { color: colors.textMuted, fontSize: 10 },
+  // Version
+  versionRow: { alignItems: 'center', paddingBottom: 8 },
+  versionText: {
+    fontSize: 13,
+    color: colors.success,
+    fontWeight: '600',
+  },
 });

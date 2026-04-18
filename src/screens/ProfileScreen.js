@@ -6,11 +6,13 @@ import {
   ScrollView,
   StyleSheet,
   StatusBar,
-  FlatList,
   ActivityIndicator,
   Platform,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Feather from '@expo/vector-icons/Feather';
 import { logout } from '../store/slices/authSlice';
 import { getChatHistory } from '../store/slices/chatSlice';
 import { colors } from '../theme/colors';
@@ -26,7 +28,7 @@ const formatDate = (iso) => {
 
 // ─── Chat History Section ─────────────────────────────────────────────────────
 const ChatHistorySection = ({ onOpenChat }) => {
-  const dispatch = useDispatch();
+  const dispatch  = useDispatch();
   const { history, historyLoad, historyErr } = useSelector((s) => s.chat);
   const { settings } = useSelector((s) => s.auth);
   const curr = settings?.currencySymbol || '₹';
@@ -62,7 +64,7 @@ const ChatHistorySection = ({ onOpenChat }) => {
         return (
           <TouchableOpacity
             key={item.id || i}
-            style={[styles.histCard]}
+            style={styles.histCard}
             onPress={() => onOpenChat && item.chatStatus === 'Accepted' && onOpenChat(item.id)}
             activeOpacity={0.8}
           >
@@ -76,7 +78,7 @@ const ChatHistorySection = ({ onOpenChat }) => {
               ) : null}
             </View>
             <View style={{ alignItems: 'flex-end', gap: 4 }}>
-              <View style={[styles.statusBadge, { borderColor: statusColor }]}>
+              <View style={[styles.statusBadge, { borderColor: statusColor, backgroundColor: statusColor + '18' }]}>
                 <Text style={[styles.statusText, { color: statusColor }]}>{item.chatStatus}</Text>
               </View>
               {item.totalAmount ? (
@@ -91,17 +93,14 @@ const ChatHistorySection = ({ onOpenChat }) => {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
+const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat, onBack }) => {
   const dispatch = useDispatch();
   const { user, walletBalance, settings } = useSelector((s) => s.auth);
   const curr = settings?.currencySymbol || '₹';
   const { can } = usePermissions();
+  const [activeSection, setActiveSection] = useState(null);
 
-  const [activeSection, setActiveSection] = useState(null); // null | 'history'
-
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const handleLogout = () => dispatch(logout());
 
   const handleRowPress = (action) => {
     if (action === 'editProfile' && onEditProfile) onEditProfile();
@@ -113,66 +112,88 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
     {
       section: 'Account',
       items: [
-        { icon: '✏️', label: 'Edit Profile', sub: 'Update your details', action: 'editProfile', permKey: 'profile_edit' },
-        // { icon: '🔔', label: 'Notifications',      sub: 'Manage alerts', permKey: 'notifications' },
-        { icon: '🌐', label: 'Language', sub: 'English (Default)' },
+        { icon: 'edit-2',         iconLib: 'feather',  label: 'Edit Profile',         sub: 'Update your details',        action: 'editProfile',  permKey: 'profile_edit' },
+        { icon: 'globe',          iconLib: 'feather',  label: 'Language',              sub: 'English (Default)' },
       ],
     },
     {
       section: 'Wallet & Orders',
       items: [
-        { icon: '💰', label: 'My Wallet', sub: 'Balance & recharge', action: 'wallet', permKey: 'profile_wallet' },
-        { icon: '💬', label: 'Chat History', sub: 'Past sessions', action: 'history' },
-        { icon: '🎁', label: 'Refer & Earn', sub: 'Invite friends, earn rewards', permKey: 'refer_and_earn' },
+        { icon: 'wallet-outline', iconLib: 'ion',      label: 'My Wallet',             sub: 'Balance & recharge',         action: 'wallet',       permKey: 'profile_wallet' },
+        { icon: 'chatbubble-ellipses-outline', iconLib: 'ion', label: 'Chat History', sub: 'Past sessions',               action: 'history' },
+        { icon: 'gift-outline',   iconLib: 'ion',      label: 'Refer & Earn',          sub: 'Invite friends, earn rewards', permKey: 'refer_and_earn' },
       ],
     },
     {
       section: 'Privacy & Support',
       items: [
-        { icon: '🔒', label: 'Privacy Policy', sub: 'How we use your data' },
-        { icon: '📃', label: 'Terms & Conditions', sub: 'App usage terms' },
-        { icon: '🛎️', label: 'Help & Support', sub: 'FAQs & contact us', permKey: 'help_support' },
-        { icon: 'ℹ️', label: 'About Astrovell', sub: 'Version 1.0.0' },
+        { icon: 'lock-closed-outline',  iconLib: 'ion', label: 'Privacy Policy',    sub: 'How we use your data' },
+        { icon: 'document-text-outline', iconLib: 'ion', label: 'Terms & Conditions', sub: 'App usage terms' },
+        { icon: 'headset-outline',  iconLib: 'ion',     label: 'Help & Support',    sub: 'FAQs & contact us',              permKey: 'help_support' },
+        { icon: 'information-circle-outline', iconLib: 'ion', label: 'About',        sub: 'Version 1.0.0' },
       ],
     },
   ];
 
   const PROFILE_ROWS = ALL_PROFILE_ROWS
-    .map(section => ({
+    .map((section) => ({
       ...section,
-      items: section.items.filter(item => !item.permKey || can(item.permKey))
+      items: section.items.filter((item) => !item.permKey || can(item.permKey)),
     }))
-    .filter(section => section.items.length > 0);
+    .filter((section) => section.items.length > 0);
+
+  const renderIcon = (item) => {
+    if (item.iconLib === 'feather') return <Feather name={item.icon} size={17} color={colors.textSecondary} />;
+    return <Ionicons name={item.icon} size={17} color={colors.textSecondary} />;
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
-      {/* Header */}
+      {/* White Header */}
       <View style={styles.header}>
+        {onBack && (
+          <TouchableOpacity style={styles.backBtn} onPress={onBack}>
+            <Ionicons name="arrow-back" size={22} color={colors.text} />
+          </TouchableOpacity>
+        )}
         <Text style={styles.headerTitle}>My Profile</Text>
         {can('profile_edit') && (
           <TouchableOpacity style={styles.editHeaderBtn} onPress={onEditProfile}>
-            <Text style={styles.editHeaderText}>✏️ Edit</Text>
+            <Feather name="edit-2" size={14} color={colors.textSecondary} />
+            <Text style={styles.editHeaderText}> Edit</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-        {/* Profile Card */}
+        {/* ── Profile Card ── */}
         <View style={styles.profileCard}>
           <View style={styles.avatarRing}>
             <View style={styles.avatarInner}>
-              <Text style={styles.avatarEmoji}>🔮</Text>
+              <Ionicons name="person" size={30} color={colors.gold} />
             </View>
           </View>
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{user?.name || 'Astro User'}</Text>
-            {user?.email ? <Text style={styles.profileDetail}>📧 {user.email}</Text> : null}
-            <Text style={styles.profileDetail}>📱 +91 {user?.contactNo || '––'}</Text>
-            {user?.birthPlace ? <Text style={styles.profileDetail}>📍 {user.birthPlace}</Text> : null}
-            {user?.gender ? <Text style={styles.profileDetail}>⚧ {user.gender}</Text> : null}
+            {user?.email ? (
+              <View style={styles.profileDetailRow}>
+                <Feather name="mail" size={11} color={colors.textMuted} />
+                <Text style={styles.profileDetail}> {user.email}</Text>
+              </View>
+            ) : null}
+            <View style={styles.profileDetailRow}>
+              <Feather name="phone" size={11} color={colors.textMuted} />
+              <Text style={styles.profileDetail}> +91 {user?.contactNo || '––'}</Text>
+            </View>
+            {user?.birthPlace ? (
+              <View style={styles.profileDetailRow}>
+                <Feather name="map-pin" size={11} color={colors.textMuted} />
+                <Text style={styles.profileDetail}> {user.birthPlace}</Text>
+              </View>
+            ) : null}
           </View>
           {user?.referral_token ? (
             <View style={styles.referralBadge}>
@@ -182,35 +203,36 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
           ) : null}
         </View>
 
-        {/* Wallet Summary */}
-        <View style={styles.walletRow}>
-          {can('profile_wallet') && can('wallet') && (
-            <View style={styles.walletCard}>
-              <Text style={styles.walletIcon}>💰</Text>
-              <Text style={styles.walletValue}>{curr}{parseFloat(user?.totalWalletAmount || walletBalance || 0).toFixed(0)}</Text>
-              <Text style={styles.walletLabel}>Balance</Text>
-            </View>
+        {/* ── Stats Row ── */}
+        <View style={styles.statsRow}>
+          {can('wallet') && (
+            <TouchableOpacity style={styles.statCard} onPress={onWallet} activeOpacity={0.8}>
+              <Text style={styles.statEmoji}>💰</Text>
+              <Text style={styles.statValue}>{curr}{parseFloat(user?.totalWalletAmount || walletBalance || 0).toFixed(0)}</Text>
+              <Text style={styles.statLabel}>Balance</Text>
+            </TouchableOpacity>
           )}
-          <View style={styles.walletCard}>
-            <Text style={styles.walletIcon}>🎯</Text>
-            <Text style={styles.walletValue}>{user?.totalSession || 0}</Text>
-            <Text style={styles.walletLabel}>Sessions</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statEmoji}>🎯</Text>
+            <Text style={styles.statValue}>{user?.totalSession || 0}</Text>
+            <Text style={styles.statLabel}>Sessions</Text>
           </View>
-          <View style={styles.walletCard}>
-            <Text style={styles.walletIcon}>⭐</Text>
-            <Text style={styles.walletValue}>{user?.rating ? parseFloat(user.rating).toFixed(1) : 'New'}</Text>
-            <Text style={styles.walletLabel}>Rating</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statEmoji}>⭐</Text>
+            <Text style={styles.statValue}>{user?.rating ? parseFloat(user.rating).toFixed(1) : 'New'}</Text>
+            <Text style={styles.statLabel}>Rating</Text>
           </View>
         </View>
 
-        {/* Recharge Button */}
-        {can('profile_wallet') && can('wallet') && (
+        {/* ── Recharge Button ── */}
+        {can('wallet') && (
           <TouchableOpacity style={styles.rechargeBtn} activeOpacity={0.85} onPress={onWallet}>
-            <Text style={styles.rechargeText}>+ Recharge Wallet</Text>
+            <Ionicons name="add-circle-outline" size={18} color="#1A1A1A" style={{ marginRight: 6 }} />
+            <Text style={styles.rechargeText}>Recharge Wallet</Text>
           </TouchableOpacity>
         )}
 
-        {/* Menu Rows */}
+        {/* ── Menu Rows ── */}
         {PROFILE_ROWS.map((section) => (
           <View key={section.section} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.section}</Text>
@@ -222,30 +244,24 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
                     activeOpacity={0.75}
                     onPress={() => handleRowPress(item.action)}
                   >
-                    <View style={[
-                      styles.rowIconBg,
-                      item.action === 'editProfile' && { backgroundColor: colors.goldGlow },
-                      item.action === 'wallet' && { backgroundColor: 'rgba(34,197,94,0.15)' },
-                    ]}>
-                      <Text style={styles.rowIcon}>{item.icon}</Text>
+                    <View style={styles.rowIconBg}>
+                      {renderIcon(item)}
                     </View>
                     <View style={styles.rowText}>
-                      <Text style={[
-                        styles.rowLabel,
-                        item.action === 'editProfile' && { color: colors.gold },
-                        item.action === 'wallet' && { color: colors.success },
-                      ]}>
+                      <Text style={styles.rowLabel}>
                         {item.label}
-                        {item.action === 'wallet' ? `  ${curr}${parseFloat(walletBalance || 0).toFixed(0)}` : ''}
+                        {item.action === 'wallet' ? `   ${curr}${parseFloat(walletBalance || 0).toFixed(0)}` : ''}
                       </Text>
                       <Text style={styles.rowSub}>{item.sub}</Text>
                     </View>
-                    <Text style={styles.rowArrow}>
-                      {item.action === 'history' && activeSection === 'history' ? '⌄' : '›'}
-                    </Text>
+                    <Ionicons
+                      name={item.action === 'history' && activeSection === 'history' ? 'chevron-up' : 'chevron-forward'}
+                      size={16}
+                      color={colors.textMuted}
+                    />
                   </TouchableOpacity>
 
-                  {/* Inline Chat History Expansion */}
+                  {/* Inline Chat History */}
                   {item.action === 'history' && activeSection === 'history' && (
                     <View style={styles.historyExpand}>
                       <ChatHistorySection onOpenChat={onOpenChat} />
@@ -259,9 +275,10 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
           </View>
         ))}
 
-        {/* Logout */}
+        {/* ── Logout ── */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.85}>
-          <Text style={styles.logoutText}>⎋  Sign Out</Text>
+          <Ionicons name="log-out-outline" size={18} color={colors.error} />
+          <Text style={styles.logoutText}>  Sign Out</Text>
         </TouchableOpacity>
 
         <View style={{ height: 24 }} />
@@ -272,70 +289,170 @@ const ProfileScreen = ({ onEditProfile, onWallet, onOpenChat }) => {
 
 export default ProfileScreen;
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: { flex: 1, backgroundColor: '#F7F7F7' },
 
+  // ── Header ────────────────────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 52 : 44,
-    paddingBottom: 16,
-    backgroundColor: colors.secondary,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 48 : 42,
+    paddingBottom: 12,
+    backgroundColor: colors.primary,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: '#F0F0F0',
+    gap: 8,
   },
-  headerTitle: { color: colors.text, fontSize: 22, fontWeight: '800' },
-  editHeaderBtn: { backgroundColor: colors.goldGlow, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: colors.borderGold },
-  editHeaderText: { color: colors.gold, fontSize: 13, fontWeight: '700' },
+  backBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: 4,
+  },
+  headerTitle: { color: colors.text, fontSize: 20, fontWeight: '800' },
+  editHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  editHeaderText: { color: colors.textSecondary, fontSize: 13, fontWeight: '600' },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 20 },
+  scroll: { paddingHorizontal: 16, paddingTop: 16 },
 
-  profileCard: { backgroundColor: colors.surface, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
-  avatarRing: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: colors.borderGold, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(245,200,66,0.08)' },
-  avatarInner: { width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(124,58,237,0.25)', alignItems: 'center', justifyContent: 'center' },
-  avatarEmoji: { fontSize: 26 },
+  // ── Profile Card ──────────────────────────────────────────────────────────
+  profileCard: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  avatarRing: {
+    width: 68, height: 68, borderRadius: 34,
+    borderWidth: 2.5, borderColor: colors.gold,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.goldBg,
+  },
+  avatarInner: {
+    width: 54, height: 54, borderRadius: 27,
+    backgroundColor: colors.goldBg,
+    alignItems: 'center', justifyContent: 'center',
+  },
   profileInfo: { flex: 1 },
   profileName: { color: colors.text, fontSize: 16, fontWeight: '800', marginBottom: 4 },
-  profileDetail: { color: colors.textSecondary, fontSize: 12, marginTop: 2 },
-  referralBadge: { backgroundColor: colors.goldGlow, borderRadius: 10, borderWidth: 1, borderColor: colors.borderGold, paddingHorizontal: 10, paddingVertical: 6, alignItems: 'center' },
+  profileDetailRow: { flexDirection: 'row', alignItems: 'center', marginTop: 3 },
+  profileDetail: { color: colors.textSecondary, fontSize: 12 },
+  referralBadge: {
+    backgroundColor: colors.goldBg,
+    borderRadius: 10, borderWidth: 1,
+    borderColor: colors.borderGold,
+    paddingHorizontal: 10, paddingVertical: 6,
+    alignItems: 'center',
+  },
   referralLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '600', textTransform: 'uppercase' },
-  referralCode: { color: colors.gold, fontSize: 12, fontWeight: '800', marginTop: 2 },
+  referralCode: { color: colors.goldDark, fontSize: 12, fontWeight: '800', marginTop: 2 },
 
-  walletRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
-  walletCard: { flex: 1, backgroundColor: colors.surface, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
-  walletIcon: { fontSize: 20, marginBottom: 6 },
-  walletValue: { color: colors.gold, fontSize: 15, fontWeight: '800' },
-  walletLabel: { color: colors.textMuted, fontSize: 10, marginTop: 3, textAlign: 'center' },
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  statCard: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    borderRadius: 12, padding: 14,
+    borderWidth: 1, borderColor: '#EFEFEF',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  statEmoji: { fontSize: 20, marginBottom: 6 },
+  statValue: { color: colors.goldDark, fontSize: 15, fontWeight: '800' },
+  statLabel: { color: colors.textMuted, fontSize: 10, marginTop: 3, textAlign: 'center' },
 
-  rechargeBtn: { backgroundColor: colors.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 24, shadowColor: colors.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 10, elevation: 6 },
-  rechargeText: { color: colors.primary, fontSize: 15, fontWeight: '800' },
+  // ── Recharge ──────────────────────────────────────────────────────────────
+  rechargeBtn: {
+    backgroundColor: colors.gold,
+    borderRadius: 12, paddingVertical: 13,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: colors.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
+  },
+  rechargeText: { color: '#1A1A1A', fontSize: 15, fontWeight: '800' },
 
-  section: { marginBottom: 18 },
-  sectionTitle: { color: colors.textMuted, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
-  sectionCard: { backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 },
-  rowIconBg: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(124,58,237,0.18)', alignItems: 'center', justifyContent: 'center' },
-  rowIcon: { fontSize: 18 },
+  // ── Sections ──────────────────────────────────────────────────────────────
+  section: { marginBottom: 14 },
+  sectionTitle: {
+    color: colors.textMuted,
+    fontSize: 11, fontWeight: '700',
+    textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8,
+  },
+  sectionCard: {
+    backgroundColor: colors.primary,
+    borderRadius: 14, borderWidth: 1,
+    borderColor: '#EFEFEF', overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 14, gap: 12 },
+  rowIconBg: {
+    width: 36, height: 36, borderRadius: 10,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center', justifyContent: 'center',
+  },
   rowText: { flex: 1 },
   rowLabel: { color: colors.text, fontSize: 14, fontWeight: '600' },
   rowSub: { color: colors.textMuted, fontSize: 11, marginTop: 1 },
-  rowArrow: { color: colors.textMuted, fontSize: 20, fontWeight: '300' },
-  divider: { height: 1, backgroundColor: colors.border, marginHorizontal: 16 },
+  divider: { height: 1, backgroundColor: '#F5F5F5', marginHorizontal: 14 },
 
-  // Chat history expand
-  historyExpand: { padding: 16, borderTopWidth: 1, borderTopColor: colors.border },
-  histCard: { backgroundColor: colors.primary, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  // Chat history
+  historyExpand: { padding: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
+  histCard: {
+    backgroundColor: '#F9F9F9',
+    borderRadius: 10, padding: 12,
+    borderWidth: 1, borderColor: '#EFEFEF',
+    flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   histLeft: { flex: 1, marginRight: 8 },
   histName: { color: colors.text, fontSize: 14, fontWeight: '700', marginBottom: 3 },
   histDate: { color: colors.textMuted, fontSize: 11, marginBottom: 2 },
   histDuration: { color: colors.textSecondary, fontSize: 11 },
-  histAmount: { color: colors.gold, fontSize: 13, fontWeight: '700' },
+  histAmount: { color: colors.goldDark, fontSize: 13, fontWeight: '700' },
   statusBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
   statusText: { fontSize: 11, fontWeight: '700' },
 
-  logoutBtn: { backgroundColor: 'rgba(255,76,106,0.12)', borderRadius: 14, paddingVertical: 15, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,76,106,0.3)', marginBottom: 8 },
+  // Logout
+  logoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF5F5',
+    borderRadius: 12, paddingVertical: 14,
+    borderWidth: 1, borderColor: 'rgba(255,59,48,0.2)',
+    marginBottom: 8,
+  },
   logoutText: { color: colors.error, fontSize: 15, fontWeight: '700' },
 });

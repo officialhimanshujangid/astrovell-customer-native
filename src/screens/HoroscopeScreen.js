@@ -10,6 +10,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { fetchDailyHoroscope, fetchLanguages, setLang, setSign } from '../store/slices/horoscopeSlice';
 import { fetchHoroscopeSign } from '../store/slices/homeSlice';
 import { colors } from '../theme/colors';
@@ -78,25 +80,24 @@ const HoroscopeScreen = ({ initialSign, onBack }) => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
-      {/* Header */}
+      {/* Yellow Header */}
       <View style={styles.header}>
-        <View style={styles.headerOrb} />
         <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backArrow}>←</Text>
+          <Ionicons name="arrow-back" size={22} color={colors.headerText} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Daily Horoscope</Text>
-        
+
         {/* Language Picker */}
         {languages.length > 0 && (
           <View style={styles.langSelectorRow}>
-            {languages.map(l => (
-              <TouchableOpacity 
-                 key={l.id} 
-                 onPress={() => dispatch(setLang(l.code))}
-                 style={[styles.langBtn, selectedLang === l.code && styles.langBtnActive]}
-                 activeOpacity={0.8}
+            {languages.map((l) => (
+              <TouchableOpacity
+                key={l.id}
+                onPress={() => dispatch(setLang(l.code))}
+                style={[styles.langBtn, selectedLang === l.code && styles.langBtnActive]}
+                activeOpacity={0.8}
               >
                 <Text style={[styles.langText, selectedLang === l.code && styles.langTextActive]}>
                   {l.code.toUpperCase()}
@@ -129,7 +130,7 @@ const HoroscopeScreen = ({ initialSign, onBack }) => {
                    onPress={() => onSelectSign(z.id)}
                    style={[styles.zodiacChip, isActive && styles.zodiacChipActive]}
                  >
-                   <Text style={[styles.zodiacChipSign, isActive && { color: colors.primary }]}>{emoji}</Text>
+                   <Text style={[styles.zodiacChipSign, isActive && { color: '#1A1A1A' }]}>{emoji}</Text>
                    <Text style={[styles.zodiacChipName, isActive && styles.zodiacChipNameActive]}>
                      {displayName}
                    </Text>
@@ -221,74 +222,82 @@ const HoroscopeScreen = ({ initialSign, onBack }) => {
 export default HoroscopeScreen;
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.primary },
-  
+  root: { flex: 1, backgroundColor: colors.secondary },
+
   // Header
   header: {
-    paddingHorizontal: 20, paddingTop: 52, paddingBottom: 14,
-    backgroundColor: colors.secondary,
+    paddingHorizontal: 16, paddingTop: 48, paddingBottom: 12,
+    backgroundColor: colors.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
     flexDirection: 'row', alignItems: 'center',
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    overflow: 'hidden', gap: 12
+    gap: 10,
   },
-  headerOrb:  { position: 'absolute', right: -50, top: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: colors.gold, opacity: 0.05 },
-  backBtn:    { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
-  backArrow:  { color: colors.text, fontSize: 18, fontWeight: '700' },
-  headerTitle:{ flex: 1, color: colors.text, fontSize: 18, fontWeight: '800' },
+  backBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  headerTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: '800' },
 
   langSelectorRow: { flexDirection: 'row', gap: 6 },
-  langBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: colors.border },
+  langBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: '#F5F5F5' },
   langBtnActive: { backgroundColor: colors.gold, borderColor: colors.gold },
   langText: { color: colors.textMuted, fontSize: 11, fontWeight: '700' },
-  langTextActive: { color: colors.primary, fontSize: 11, fontWeight: '800' },
+  langTextActive: { color: '#1A1A1A', fontSize: 11, fontWeight: '800' },
 
-  zodiacScroll: { paddingTop: 16, backgroundColor: colors.primary },
+  zodiacScroll: { paddingTop: 12, paddingBottom: 4, backgroundColor: colors.primary },
   zodiacChip: {
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: colors.surface, borderRadius: 12,
+    backgroundColor: colors.primary, borderRadius: 12,
     borderWidth: 1, borderColor: colors.border,
     width: 68, height: 72,
   },
-  zodiacChipActive: { borderColor: colors.gold, backgroundColor: colors.gold, transform: [{ scale: 1.05 }] },
+  zodiacChipActive: { borderColor: colors.gold, backgroundColor: colors.goldBg, transform: [{ scale: 1.05 }] },
   zodiacChipSign: { fontSize: 22, marginBottom: 4 },
-  zodiacChipName: { color: colors.textSecondary, fontSize: 10, fontWeight: '600', textTransform: 'uppercase' },
-  zodiacChipNameActive: { color: colors.primary, fontWeight: '800' },
+  zodiacChipName: { color: colors.textMuted, fontSize: 10, fontWeight: '600', textTransform: 'uppercase' },
+  zodiacChipNameActive: { color: colors.goldDark, fontWeight: '800' },
 
-  scrollContent: { paddingHorizontal: 20 },
+  scrollContent: { paddingHorizontal: 16 },
 
-  bigSignCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(245,200,66,0.1)', borderWidth: 1, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  bigSignCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.goldBg, borderWidth: 2, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   bigSignEmoji:  { fontSize: 40 },
-  signTitleName: { color: colors.gold, fontSize: 24, fontWeight: '800', letterSpacing: 1 },
+  signTitleName: { color: colors.goldDark, fontSize: 24, fontWeight: '800', letterSpacing: 1 },
   signTitleDate: { color: colors.textMuted, fontSize: 14, marginTop: 4, fontWeight: '600' },
 
   centerLoading: { alignItems: 'center', marginTop: 60 },
   loadingText: { color: colors.textMuted, fontSize: 14, marginTop: 16 },
 
   summaryCard: {
-    backgroundColor: 'rgba(124,58,237,0.1)',
-    borderRadius: 20, borderWidth: 1, borderColor: 'rgba(124,58,237,0.3)',
-    padding: 20, marginBottom: 24
+    backgroundColor: colors.primary,
+    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
+    padding: 18, marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   summaryEmoji: { fontSize: 24, marginBottom: 8 },
-  summaryTitle: { color: colors.purpleLight, fontSize: 16, fontWeight: '800', marginBottom: 10 },
+  summaryTitle: { color: colors.goldDark, fontSize: 16, fontWeight: '800', marginBottom: 10 },
   summaryText:  { color: colors.textSecondary, fontSize: 15, lineHeight: 24 },
 
-  sectionHeader: { color: colors.textMuted, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, marginLeft: 4 },
+  sectionHeader: { color: colors.textMuted, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10, marginLeft: 4 },
 
-  traitsGrid: { flexDirection: 'row', gap: 12, marginBottom: 24 },
+  traitsGrid: { flexDirection: 'row', gap: 10, marginBottom: 20 },
   traitBox: {
-    flex: 1, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    alignItems: 'center', paddingVertical: 16, paddingHorizontal: 8
+    flex: 1, backgroundColor: colors.primary, borderRadius: 14, borderWidth: 1, borderColor: colors.border,
+    alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6,
   },
-  traitEmoji: { fontSize: 24, marginBottom: 8 },
-  traitVal: { color: colors.text, fontSize: 15, fontWeight: '800', marginBottom: 2, textAlign: 'center' },
-  traitLbl: { color: colors.textMuted, fontSize: 11, fontWeight: '600' },
+  traitEmoji: { fontSize: 22, marginBottom: 6 },
+  traitVal: { color: colors.text, fontSize: 14, fontWeight: '800', marginBottom: 2, textAlign: 'center' },
+  traitLbl: { color: colors.textMuted, fontSize: 10, fontWeight: '600' },
 
-  statsCard: { backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 20, gap: 16 },
+  statsCard: { backgroundColor: colors.primary, borderRadius: 14, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 14 },
   statLine: { width: '100%' },
-  statLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+  statLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
   statLabel: { color: colors.textSecondary, fontSize: 13, fontWeight: '600' },
   statValueText: { fontSize: 13, fontWeight: '800' },
-  barBg: { height: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' },
+  barBg: { height: 6, backgroundColor: colors.border, borderRadius: 3, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 3 },
 });

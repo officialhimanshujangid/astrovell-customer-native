@@ -9,13 +9,23 @@ const apiClient = axios.create({
   timeout: 15000,
 });
 
-// Request interceptor — attach Bearer token from AsyncStorage
+// Request interceptor — attach Bearer token and Language from AsyncStorage
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      const token = await AsyncStorage.getItem('customerToken');
+      const [token, lang] = await Promise.all([
+        AsyncStorage.getItem('customerToken'),
+        AsyncStorage.getItem('customerGlobalLang')
+      ]);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+      if (lang) {
+        config.headers['Accept-Language'] = lang;
+        // Also inject into body payload dynamically (some backend APIs look for body.lang)
+        if (config.data && typeof config.data === 'object' && !config.data.lang) {
+          config.data.lang = lang;
+        }
       }
     } catch (_) {}
     return config;
